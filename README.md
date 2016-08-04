@@ -1,4 +1,4 @@
-# Ecmascript 6
+# ECMAScript 6
 
 ## 使用环境
 ### Chrome
