@@ -2,7 +2,7 @@
 
 ## 使用环境
 ### Chrome
-访问[Chrome配置](chrome://flags/#enable-javascript-harmony),开启`enable-javascript-harmony`特性,就可以使用`ES6`了.
+访问[chrome://flags/#enable-javascript-harmony](chrome://flags/#enable-javascript-harmony),开启`enable-javascript-harmony`特性,就可以使用`ES6`了.
 
 ### Nodejs
 升级最新的Nodejs版本,在Nodejs中使用`ES6`.
