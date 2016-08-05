@@ -241,3 +241,26 @@ const c=3;
 console.log(window.b);  //undefined
 console.log(window.c);  //undefined
 ```
+
+
+## Array解构
+将变量封装成数组的形式,然后将数组和对象中提取的值一一对应的赋值给这些变量,就叫做数组解析.
+
+``` javascript
+var [a,b,c] = [1,2,3];
+console.log(a); //1
+console.log(b); //2
+console.log(c); //3
+```
+
+还可以以嵌套的形式赋值
+
+``` javascript
+var [a,[[b],c]] = [1,[[2],3]];
+console.log(a); //2
+```
+
+
+
+
+
