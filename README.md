@@ -1607,3 +1607,248 @@ console.log(mult(plus(5))); //36
 ### 尾调用优化
 略
 
+
+## 对象的扩展
+
+### 属性简写
+
+``` javascript
+let a = '1';
+let b = {a};
+console.log(b); //Object { a="1"}
+```
+
+
+``` javascript
+function f(x,y){
+    console.log({x,y}); // console.log({x:x,y:y});
+}
+f(1,2); //Object { x=1,  y=2}
+```
+
+>提示: `{}` 内的是属性名,同时这个属性名作为变量的值作为属性值.需要注意的是`{}`的属性名总是字符串.
+
+
+### 方法简写
+
+``` javascript
+var o = {
+
+    sum(x,y) {  //sum: function(x,y) {
+        console.log(x + y);
+    },
+
+    mult(x,y) {
+        console.log(x * y);
+    }
+};
+
+o.sum(1,2); //3
+```
+
+如果是`Generator`函数
+
+``` javascript
+var gen = {
+    *m() {
+        yield 'hello world';
+    }
+};
+```
+
+对象字面量的属性名可以是`JavaScript`表达式
+
+``` javascript
+var prop = 'ziyi2';
+function f(){
+    return 'prop';
+}
+
+let obj = {
+    [prop + '1']: 'ziyi21',
+    [f() + '2']: 'prop2'
+};
+
+console.log(obj);   //Object { ziyi21="ziyi21",  prop2="prop2"}
+```
+
+>提示:  方法作为一个变量的属性也可以使用`JavaScript`表达式.
+
+
+### 方法的name属性
+
+### Object.is
+与 `===` 的作用基本一致,同时使`NaN`等于自身, `+0`和`-0`不相等.
+
+``` javascript
+console.log(+0 === -0);         //true
+console.log(NaN === NaN);       //false
+console.log(Object.is(+0,-0));  //false
+console.log(Object.is(NaN,NaN));//true
+```
+
+### Object.assign
+
+第一个参数是目标对象,之后的参数都是源对象
+``` javascript
+let target = {a:1};
+let source1 = {b:2};
+let source2 = {c:3};
+Object.assign(target,source1,source2);
+console.log(target);    //Object { a=1,  b=2,  c=3}
+```
+>提示: 类似于`extend`函数的作用,如果有同名属性,目标对象的属性值会被覆盖.
+
+``` javascript
+let target = {a:1};
+let source1 = {a:2};
+let source2 = {a:3};
+Object.assign(target,source1,source2);
+console.log(target);    //Object {a=3}
+```
+
+>提示: 该方法只拷贝源对象的自身属性(不拷贝继承属性),也不拷贝不可枚举的属性. 
+
+该方法实现的是浅拷贝,而不是深拷贝,例如如果源对象某个属性的值是对象,那么目标对象拷贝得到的这个是这个对象的引用
+
+``` javascript
+let x = {a:{b:2}, c:3};
+let y = {};
+
+Object.assign(y,x);
+
+x.a.b = 111;
+x.c = 222;
+console.log(y.a.b); //111 变了
+console.log(y.c);   //3
+```
+
+补充一下深拷贝和浅拷贝
+``` javascript
+//浅拷贝
+let x = {a:1,b:2};
+
+let y = x;
+x.a = 2;            //x对象变了y对象也变了
+console.log(y.a);   //2 x对象和y对象引用同一个地址
+
+
+//深拷贝
+let c = {};
+
+for(let key in x){
+    c[key] = x[key];
+}
+
+x.a = 3;
+x.b = 4;            //x和c对象不是引用同一个地址空间
+console.log(c);     //Object { a=2,  b=2}
+```
+
+当处理数组时,会把数组的索引当成属性来执行
+
+``` javascript
+let arr = [1,2,3,4,5];
+let arr1 = [2,1];
+Object.assign(arr,arr1);
+console.log(arr);   //[2, 1, 3, 4, 5]
+```
+#### 用途
+- 为对象添加属性
+
+``` javascript
+class Person {
+    constructor(name,age) {
+        Obeject.assign(this,{name,age});
+    }
+}
+```
+
+- 为对象添加方法
+
+``` javascript
+class Person {
+    constructor(name,age) {
+        Obeject.assign(this,{name,age});
+    }
+}
+
+
+Object.assign(Person.prototype, {
+    fun1() {
+
+    },
+    fun2() {
+
+    }
+});
+
+//类似于
+Person.prototype.fun1 = function() {};
+Person.prototype.fun2 = function() {};
+```
+
+- 克隆对象
+
+``` javascript
+function clone(obj){
+    return Object.assign({},obj);
+}
+
+//拷贝带源对象的继承值
+function clone1(obj){
+    let proto = Object.getPrototypeOf(obj);
+    return Object.assign(Object.create(proto),obj);
+}
+```
+
+合并返回新对象
+
+``` javascript
+let merge = (...args) => Object.assign({},...args);
+```
+
+### 属性的可枚举性
+-  `for...in`循环：只遍历对象自身的和继承的可枚举的属性
+-  `Object.keys()`：返回对象自身的所有可枚举的属性的键名
+-  `JSON.stringify()`：只串行化对象自身的可枚举的属性
+
+`Object.assign()`会忽略不可枚举属性.操作中引入继承的属性会让问题复杂化，大多数时候，我们只关心对象自身的属性。所以，尽量不要用`for...in`循环，而用`Object.keys()`代替.
+
+### 属性的遍历
+- `for...in`
+只遍历对象自身的和继承的可枚举的属性（不含`Symbol`属性）.
+- `Object.keys()`
+包括对象自身的（不含继承的）所有可枚举属性（不含`Symbol`属性）. `Object.getOwnPropertyNames`
+包含对象自身的所有属性（不含`Symbol`属性，但是包括不可枚举属性).
+`Object.getOwnPropertySymbols(obj)`
+包含对象自身的所有`Symbol`属性.
+- `Reflect.ownKeys(obj)`
+返回所有的属性,不管属性名是`Symbol`还是字符串,不管是否可枚举.
+
+遍历的次序规则
+ - 首先遍历所有属性名为数值的属性，按照数字排序
+ - 其次遍历所有属性名为字符串的属性，按照生成时间排序
+ - 最后遍历所有属性名为Symbol值的属性，按照生成时间排序
+
+### `__proto__`,Object.setPrototypeOf,Object.getPrototypeOf
+#### `__proto__`
+`__proto__`属性（前后各两个下划线），用来读取或设置当前对象的prototype对象。目前，所有浏览器（包括IE11）都部署了这个属性.
+
+#### Object.setPrototypeOf
+用来设置一个对象的`prototype`对象.它是`ES6`正式推荐的设置原型对象的方法.格式如下
+
+```
+Object.setPrototypeOf(obj,prototype)
+```
+
+#### Object.getPrototypeOf
+
+### Objetct.keys,Objetct.values,Objetct.entries
+
+- `Objetct.keys`
+遍历对象的（不含继承的）可遍历的属性名,返回的是数组
+- `Objetct.values (ES7)`
+遍历对象的（不含继承的）可遍历的属性值,返回的是数组
+- `Objetct.entries (ES7)`
+遍历对象的（不含继承的）可遍历的属性的键值对,返回的是数组
