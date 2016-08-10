@@ -2009,5 +2009,172 @@ module.exports = global[s]; //导出的全局变量的该属性不会被修改
 - Symbol.toStringTag
 - Symbol.unscopables
 
+### Proxy和Reflect
 
+#### Proxy
+用于修改某系操作的默认行为,可以理解为对目标对象做了拦截,访问对象之前,先执行拦截,所以可以对外界的访问行文进行过滤和改写.
+
+生成`Proxy`实例,`target`表示要拦截的目标对象,`hander`用来定制拦截行为,注意`hander`也是一个对象
+
+``` javascript
+let proxy = new Proxy(target,handler);
+```
+
+``` javascript
+let proxy = new Proxy({},{  //{}是对象
+    get: function(target,property){
+        return 11;
+    }
+});
+
+console.log(proxy.name);    //11
+console.log(proxy.age);     //11
+```
+
+>提示: `hanlder`对象里的拦截函数都有两个参数,一个是目标对象`target`,一个是所要访问的属性`property`. 以上的拦截函数`get`总是返回11,所要访问任何属性都得到11.要使得`Proxy`起作用，必须针对`Proxy`实例（上例是`proxy`对象）进行操作，而不是针对目标对象（上例是空对象）进行操作.
+
+
+如果`handler`没有设置任何拦截，那就等同于直接通向原对象.
+
+``` javascript
+let person = {
+    name:'ziyi2',
+    age: 11
+};
+
+let proxy = new Proxy(person,{});   //handler是一个空对象
+
+proxy.name = 'ziyi3';       //相当于修改了person对象的name属性
+proxy.home = 'Hangzhou';    //相当于给person对象创建了一个home属性并赋值
+
+console.log(person.name);   //ziyi3
+console.log(person.home);   //Hangzhou
+```
+>提示:  此时访问`proxy`就等同于访问`person`.
+
+Proxy实例也可以作为其他对象的原型对象
+
+``` javascript
+let proxy = new Proxy({},{
+    get(target,property) {
+        return 35;
+    }
+}); 
+
+let obj = Object.create(proxy); //proxy是obj的原型对象
+
+console.log(obj.name);  //35 
+```
+
+
+#### 拦截方法
+
+- `get(target,prop,receiver)`
+拦截对象属性的读取,最后一个参数后续说明.
+- `set(target,prop,value,receiver)`
+拦截对象属性的设置,返回一个布尔值.
+...
+
+- `construct(target,args)`
+拦截`Proxy`实例作为构造函数调用的操作，比如`new proxy(...args)`.
+
+
+``` javascript
+function createArray(...elements) {
+  let handler = {
+    get(target, propKey, receiver) {
+      let index = Number(propKey);
+      if (index < 0) {
+        propKey = String(target.length + index);
+      }
+      return Reflect.get(target, propKey, receiver);
+    }
+  };
+
+  let target = [];
+  target.push(...elements);
+  return new Proxy(target, handler);
+}
+
+let arr = createArray('a', 'b', 'c');
+console.log(arr[-1]); //c
+```
+
+`construct`方法用于拦截`new`命令
+
+``` javascript
+var p = new Proxy(function(){},{
+    construct(target,args) {
+        return {value:args[0]*10};
+    }
+});
+
+console.log(new p(2).value);    //20
+```
+
+>提示:`construct`方法返回的必须是一个对象，否则会报错
+
+#### Reflect
+将`Object`对象的一些明显属于语言内部的方法（比如`Object.defineProperty`），放到`Reflect`对象上.未来的新方法将只部署在Reflect对象上.
+
+修改某些`Object`方法的返回结果，让其变得更合理。比如，`Object.defineProperty(obj, name, desc)`在无法定义属性时，会抛出一个错误，而`Reflect.defineProperty(obj, name, desc)`则会返回`false`
+
+ 让`Object`操作都变成函数行为。某些`Object`操作是命令式，比如`name in obj`和`delete obj[name]`，而`Reflect.has(obj, name)`和`Reflect.deleteProperty(obj, name)`让它们变成了函数行为.
+
+``` javascript
+let obj = {
+    name: 'ziyi2'
+};
+
+console.log('name' in obj);             //true
+console.log(Reflect.has(obj,'name'));   //true
+```
+
+``` javascript
+let obj = {
+    name: 'ziyi2'
+};
+
+
+console.log('name' in obj);             //true
+console.log(Reflect.has(obj,'name'));   //true
+
+
+Reflect.set(obj,'age',23);
+console.log(obj.age);                   //23
+```
+
+`Reflect`对象的方法与`Proxy`对象的方法一一对应，只要是`Proxy`对象的方法，就能在`Reflect`对象上找到对应的方法。这就让`Proxy`对象可以方便地调用对应的`Reflect`方法，完成默认行为，作为修改行为的基础。也就是说，不管`Proxy`怎么修改默认行为，你总可以在`Reflect`上获取默认行为
+
+``` javascript
+Proxy(target, {
+  set: function(target, name, value, receiver) {
+    var success = Reflect.set(target,name, value, receiver);
+    if (success) {
+      log('property ' + name + ' on ' + target + ' set to ' + value);
+    }
+    return success;
+  }
+});
+```
+
+上面代码中，`Proxy`方法拦截`target`对象的属性赋值行为。它采用`Reflect.set`方法将值赋值给对象的属性，然后再部署额外的功能
+
+#### Reflect对象的方法
+- `Reflect.get(target, name, receiver)`
+查找并返回`target`对象的`name`属性，如果没有该属性，则返回`undefined`.如果`name`属性部署了读取函数，则读取函数的`this`绑定`receiver`
+
+``` javascript
+var obj = {
+  get foo() { return this.bar(); },
+  bar: function() { ... }
+};
+
+// 下面语句会让 this.bar()
+// 变成调用 wrapper.bar()
+Reflect.get(obj, "foo", wrapper);
+```
+
+- `Reflect.set(target, name, value, receiver)`
+...
 
