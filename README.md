@@ -1852,3 +1852,162 @@ Object.setPrototypeOf(obj,prototype)
 遍历对象的（不含继承的）可遍历的属性值,返回的是数组
 - `Objetct.entries (ES7)`
 遍历对象的（不含继承的）可遍历的属性的键值对,返回的是数组
+
+### Symbol
+
+#### 概述
+`ES5`中的属性只能是字符串,在别人封装的对象的基础上,增加新的方法可能会出现重复,所以在`ES6`中新增了一种数据类型`Symbol`,也就是说在`ES6`中对象的属性可以是字符串也可以是`Symbol`类型.
+
+>提示: `ES5`中的数据类型有`Undefined`,`Null`,`Boolean`,`String`,`Number`,`Object`,在`ES6`中新增了`Symbol`.
+
+凡是属性名是Symbol类型,这些属性就都是独一无二的.
+
+``` javascript
+let s = Symbol();
+let s1 = Symbol();
+
+obj = {};
+obj[s] = '1';
+obj[s1] = '2';
+
+console.log(s === s1);  //false
+```
+
+>提示: `Symbol`和`String`一样.由于它是基本数据类型,所以不需要使用`new`关键字.
+
+即使传入的参数一样,也还是唯一的
+
+``` javascript
+let s = Symbol('ziyi2');
+let s1 = Symbol('ziyi2');
+
+console.log(s === s1);  //false
+```
+`Symbol`类型的数据不能隐式转换为字符串,所以在对象中使用属性的时候不能使用`.`运算符,因为`.`运算符后面跟的默认都是字符串.
+
+``` javascript
+let s = Symbol('ziyi2');
+let s1 = Symbol('ziyi2');
+ 
+var obj = {};
+obj.s = '1';    //.后面的s其实是字符串
+console.log(obj['s']);  
+
+obj[s] = '2';
+
+for(let key in obj){    //不能遍历Symbol属性
+    console.log(key);   //s 这个是字符串属性
+}
+
+console.log(Object.getOwnPropertySymbols(obj));     //[Symbol(ziyi2)] 这个是Symbol属性
+console.log(s + '12334');   //can't convert symbol to string
+console.log(s.toString() + '1234'); //Symbol(ziyi2)1234
+```
+
+>提示: 只能显示转化为字符串,由于`.`属性后面跟的是字符串,所以不能用`Symbol`变量用作对象的`.`属性.所以`Symbol`值必须放在方括号之中.
+
+``` javascript
+let s = Symbol('ziyi2');
+ 
+obj = {
+
+    [s](arg) {
+        console.log('1');
+    }
+};
+
+obj[s]('1');    //1
+```
+>提示:  `Symbol`用来表示对象的属性只能采用`[]`表示法.
+
+可以用来定义不同的常量
+
+``` javascript
+const status = {
+    success: Symbol('success'),
+    error: Symbol('error')
+};
+
+function f(sta){
+    switch(sta){
+        case status.success:
+            console.log('1');
+            break;
+
+        case status.error:
+            console.log('2');
+            break;
+
+        default:
+            break;      
+    }
+}
+
+f(status.success);  //1
+f(status.error);    //2 
+```
+
+#### 属性遍历
+
+- `Object.getOwnPropertySymbols`
+- `for...in`
+- `Object.getOwnPropertyNames`
+- `Reflect.ownKeys`
+- `Object.keys`
+>提示: 注意`Object.keys`和`for...in`的区别.
+
+####  Symbol.for,Symbol.keyFor
+如果想使用同一个`Symbol`值,`Symbol.for`方法接受一个字符串作为参数,然后先搜索有没有该参数作为名称的`Symbol`值,有则返回,没有则创建一个该字符串为名称的`Symbol`值.
+
+```javascript
+let s = Symbol('foo');
+let s1 = Symbol.for('foo');
+console.log(s === s1);  //false
+let s2 = Symbol.for('foo');
+console.log(s1 === s2); //true
+```
+
+`Symbol.for()`与`Symbol()`这两种写法，都会生成新的`Symbol`。它们的区别是，前者会被登记在全局环境中供搜索，后者不会。`Symbol.keyFor`用于返回登记的值
+
+``` javascript
+let s = Symbol('foo');
+let s1 = Symbol.for('foo');
+console.log(s === s1);  //false
+let s2 = Symbol.for('foo');
+console.log(s1 === s2); //true
+
+console.log(Symbol.keyFor(s));  //undefined
+console.log(Symbol.keyFor(s1)); //foo
+```
+
+防止导出的对象的属性被覆盖
+
+``` javascript
+const s = Symbol.for('foo');
+
+function F(name){
+    this.name = name;
+}
+
+if(!global[s]){
+    global[s] = new F('ziyi2');
+}
+
+module.exports = global[s]; //导出的全局变量的该属性不会被修改
+```
+
+#### 其他方法
+- Symbol.hasInstance 
+- Symbol.isConcatSpreadable
+- Symbol.species
+- Symbol.match
+- Symbol.replace
+- Symbol.search
+- Symbol.split
+- Symbol.iterator
+- Symbol.toPrimitive 
+- Symbol.toStringTag
+- Symbol.unscopables
+
+
+
