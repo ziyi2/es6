@@ -2178,3 +2178,215 @@ Reflect.get(obj, "foo", wrapper);
 - `Reflect.set(target, name, value, receiver)`
 ...
 
+### Set和Map
+#### Set
+
+ES6提供了新的数据结构`Set`.它类似于数组，但是成员的值都是唯一的，没有重复的值.`Set`本身是一个构造函数，用来生成`Set`数据结构.
+
+``` javascript
+let s = new Set();
+let arr = [1,2,3,3,3,3,3,3,4,5,6,7,8,9];
+arr.map(x => s.add(x)); //add方法向Set结构加入成员
+for(let i of s){
+    console.log(i);     //1,2,3,4,5,6,7,8,9 不会加入重复的值
+}
+console.log([...s]);    //[1,2,3,4,5,6,7,8,9]
+let s1 = new Set(arr);  //接受一个数组参数
+console.log([...s1]);   //[1,2,3,4,5,6,7,8,9]
+console.log(s1.size);   //9
+
+//数组去重
+[...new Set(arr)];
+```
+
+>提示: `Set`不能加重复的`NaN`,`Set`不能加入重复的值,加入的值不会发生类型转换.
+
+判断是否重复,也就是是否相等,使用`===`
+``` javascript
+let s = new Set();
+s.add('5');
+s.add(5);
+console.log([...s]);    //["5", 5]
+console.log(s.size);    //2
+```
+
+#####  Set的方法和属性
+属性
+- `size` 
+成员总数
+- `constructor`
+构造函数
+
+方法
+- `add`
+添加Set成员,返回Set结构本身
+- `delete`
+返回一个布尔值,表示是否删除成功
+- `has`
+判断是否是Set的成员,返回布尔值
+- `clear` 
+清除所有成员,没有返回值
+
+``` javascript
+let s = new Set();
+s.add('5');
+s.add(5);
+
+console.log([...s]);    //["5", 5] 转化为数组
+console.log(s.size);    //2
+
+let arr = Array.from(s);
+console.log(arr);       //["5", 5] 转化为数组
+
+//数组去重方法二
+
+function dedupe(arr){
+    return Array.from(new Set(arr));
+}
+
+console.log(dedupe([1,1,2,3,4,5,5]));   //[1, 2, 3, 4, 5]
+```
+
+##### 遍历
+ - `keys()`
+ - `vaules()`
+ - `entries()`
+ - `forEach()`
+
+``` javascript
+let set = new Set(['red', 'green', 'blue']);
+
+for (let item of set.keys()) {
+  console.log(item);
+}
+// red
+// green
+// blue
+
+for (let item of set.values()) {
+  console.log(item);
+}
+// red
+// green
+// blue
+
+for (let item of set.entries()) {
+  console.log(item);
+}
+// ["red", "red"]
+// ["green", "green"]
+// ["blue", "blue"]
+```
+
+其实还可以使用`for...of`遍历`Set`.`Set`结构的实例的`forEach`方法，用于对每个成员执行某种操作，没有返回值.
+
+#### WeakSet
+类似于`Set`略.
+
+#### Map
+Map是比对象更灵活的一种数据结构,对象本身就就是由键值对组成的,但是属性只能是字符串,Map的键则可以用对象等更复杂方式来表示.
+
+把对象`o`当做`m`的一个键
+
+``` javascript
+let m = new Map();
+let o = {};
+
+m.set(o,'o object');
+console.log(m.get(o));  //o object
+console.log(m.has(o));  //true
+
+console.log(m.delete(o));   //true
+console.log(m.has(o));  //false
+```
+
+接受一个数组作为参数,该数组的成员仍然是一个个数组,每个数组中都有两个元素表示键和值
+
+``` javascript
+let m = new Map([['name','ziyi2'],['age','23']]);
+console.log(m.size);        //2
+console.log(m.get('name')); //ziyi2
+console.log(m.has('name')); //true
+```
+
+如果键相同,那么后面的就会把前面的覆盖掉
+``` javascript
+let m = new Map([['name','ziyi2'],['name','23']]);
+console.log(m.size);        //1
+console.log(m.get('name')); //23
+console.log(m.has('name')); //true
+
+m.set('b','ziyi2');
+console.log(m.get('b'));    //ziyi2
+
+m.set(['a'],"ziyi2");
+console.log(m.get(['a']));  //undefined
+```
+
+>提示: 最后一个是数组,其实是两个不同的地址,所以没办法获取值,就跟对象是一样的
+
+##### 方法和属性
+类似于`Set`.
+
+##### 遍历方法
+类似于`Set`.也可以使用`...`扩展运算符.
+
+#### WeakMap
+略.
+
+### Iterator和for...of循环
+`ES5`中的表示集合的属性类型只有`Array`和`Object`,`ES6`中又新增了`Map`和`Set`.需要一种统一的接口机制，来处理所有不同的数据结构,遍历器（`Iterator`）就是这样一种机制.它是一种接口，为各种不同的数据结构提供统一的访问机制.任何数据结构只要部署`Iterator`接口，就可以完成遍历操作（即依次处理该数据结构的所有成员）.
+
+`Iterator`的作用有三个：一是为各种数据结构，提供一个统一的、简便的访问接口；二是使得数据结构的成员能够按某种次序排列；三是`ES6`创造了一种新的遍历命令`for...of`循环，`Iterator`接口主要供`for...of`消费.
+
+`Iterator`的遍历过程:
+
+（1）创建一个指针对象，指向当前数据结构的起始位置.也就是说，遍历器对象本质上，就是一个指针对象.
+（2）第一次调用指针对象的`next`方法，可以将指针指向数据结构的第一个成员.
+（3）第二次调用指针对象的`next`方法，指针就指向数据结构的第二个成员.
+（4）不断调用指针对象的`next`方法，直到它指向数据结构的结束位置.
+
+每一次调用`next`方法，都会返回数据结构的当前成员的信息.具体来说，就是返回一个包含`value`和`done`两个属性的对象.其中，`value`属性是当前成员的值，`done`属性是一个布尔值，表示遍历是否结束.
+
+``` javascript
+function createIterator(array){
+    let nextIndex = 0;
+    return {
+        next () {
+            return nextIndex < array.length ? {value: array[nextIndex ++], done: false} :
+                                              {value: undefined, done: true};
+        }
+    };
+}
+
+
+let it = createIterator([1,2]);
+console.log(it.next());     //Object { value=1,  done=false}
+console.log(it.next());     //Object { value=2,  done=false}
+console.log(it.next());     // Object { value=undefined, done=true}
+```
+
+上面的函数的作用就是返回一个遍历器对象,对数组执行这个函数,就会返回该数组的遍历器对象(指针对象)`it`.
+
+在`ES6`中，有些数据结构原生具备`Iterator`接口（比如数组），即不用任何处理，就可以被`for...of`循环遍历，有些就不行（比如对象）.原因在于，这些数据结构原生部署了`Symbol.iterator`属性（详见下文），另外一些数据结构没有.凡是部署了`Symbol.iterator`属性的数据结构，就称为部署了遍历器接口.调用这个接口，就会返回一个遍历器对象.
+
+#### 数据结构的默认Iterator接口
+`ES6`规定，默认的`Iterator`接口部署在数据结构的`Symbol.iterator`属性，或者说，一个数据结构只要具有`Symbol.iterator`属性，就可以认为是“可遍历的”（`iterable`）。**调用`Symbol.iterator`**方法**，就会得到当前数据结构默认的遍历器生成函数。**
+
+在`ES6`中，有三类数据结构原生具备`Iterator`接口：`Array`、类数组对象、`Set`和`Map`结构。
+
+
+``` javascript
+let arr = ['a', 'b', 'c'];
+let iter = arr[Symbol.iterator]();
+
+console.log(iter.next()); // { value: 'a', done: false }
+console.log(iter.next()); // { value: 'b', done: false }
+console.log(iter.next()); // { value: 'c', done: false }
+console.log(iter.next()); // { value: undefined, done: true }
+```
+上面代码中，变量`arr`是一个数组，原生就具有遍历器接口，部署在`arr`的`Symbol.iterator`属性上面。所以，调用这个属性，就得到遍历器对象。
+
+上面提到，原生就部署`Iterator`接口的数据结构有三类，对于这三类数据结构，不用自己写遍历器生成函数，`for...of`循环会自动遍历它们。除此之外，其他数据结构（主要是对象）的`Iterator`接口，都需要自己在`Symbol.iterator`属性上面部署，这样才会被`for...of`循环遍历。
+
+对象（`Object`）之所以没有默认部署`Iterator`接口，是因为对象的哪个属性先遍历，哪个属性后遍历是不确定的，需要开发者手动指定。
