@@ -2390,3 +2390,205 @@ console.log(iter.next()); // { value: undefined, done: true }
 上面提到，原生就部署`Iterator`接口的数据结构有三类，对于这三类数据结构，不用自己写遍历器生成函数，`for...of`循环会自动遍历它们。除此之外，其他数据结构（主要是对象）的`Iterator`接口，都需要自己在`Symbol.iterator`属性上面部署，这样才会被`for...of`循环遍历。
 
 对象（`Object`）之所以没有默认部署`Iterator`接口，是因为对象的哪个属性先遍历，哪个属性后遍历是不确定的，需要开发者手动指定。
+
+
+类似数组的对象调用数组的`Symbol.iterator`方法
+
+``` javascript
+let iterable = {
+    0: 'a',
+    1: 'b',
+    2: 'c',
+    length: 3,
+    [Symbol.iterator]: Array.prototype[Symbol.iterator] //Symbol.iterator方法直接饮用数组的Iterator接口
+};
+
+
+for(let item of iterable){
+    console.log(item);  //a b c
+}
+
+console.log([...iterable]); //["a", "b", "c"]
+```
+
+需要注意的是普通对象部署数组的`Symbol.iterator`方法并没有效果.
+
+``` javascript
+let iterable = {
+    a: 'a',
+    b: 'b',
+    c: 'c',
+    length: 3,
+    [Symbol.iterator]: Array.prototype[Symbol.iterator] //Symbol.iterator方法直接饮用数组的Iterator接口
+};
+
+
+for(let item of iterable){
+    console.log(item);  //undefined undefined undefined
+}
+
+console.log([...iterable]); //[undefined, undefined, undefined]
+
+let  iter = iterable[Symbol.iterator]();
+console.log(iter.next());   //Object { value=undefined,  done=false}
+console.log(iter.next());   //Object { value=undefined,  done=false}
+console.log(iter.next());   //Object { value=undefined,  done=false}
+console.log(iter.next());   //Object { done=true,  value=undefined}
+```
+
+如果`Symbol.iterator`方法对应的不是遍历器生成函数（即会返回一个遍历器对象），解释引擎将会报错
+
+``` javascript
+var obj = {};
+
+obj[Symbol.iterator] = () => 1;
+
+[...obj] //TypeError: (intermediate value).next is not a function
+```
+
+有了遍历器接口(`Iterator`接口),数据结构就可以用`for...of`循环遍历,也可以使用`while`循环遍历
+
+
+``` javascript
+let iterable = {
+    0: 'a',
+    1: 'b',
+    2: 'c',
+    length: 3,
+    [Symbol.iterator]: Array.prototype[Symbol.iterator] //Symbol.iterator方法直接饮用数组的Iterator接口
+};
+
+
+for(let item of iterable){
+    console.log(item);  //a b c
+}
+
+console.log([...iterable]); //["a", "b", "c"]
+
+let  iter = iterable[Symbol.iterator]();
+
+let result = iter.next();
+
+while(!result.done){
+    let x = result.value;
+    console.log(x);   //a b c
+    result = iter.next();
+}
+```
+
+#### 调用Iterator接口的场合
+有一些场合会默认调用`Iterator`接口（即`Symbol.iterator`方法）,例如`for...of`循环
+
+##### 解构赋值
+
+对数组和`Set`结构进行解构赋值时,会默认调用`Symbol.iterator`方法
+
+``` javascript
+let set = new Set().add('a').add('b').add('c');
+let [x,y,z] = set;
+let [first,...rest] = set;
+console.log(rest);  //["b", "c"]
+```
+
+##### `...`扩展运算符
+该运算符也会调用默认的`iterator`接口
+
+``` javascript
+let str = 'hello';
+console.log([...str]);  //["h", "e", "l", "l", "o"]
+
+let arr = ['r','e'];
+console.log([...str,...arr]);   //["h", "e", "l", "l", "o", "r", "e"]
+```
+
+>提示: 只要某个数据接口部署了`iterator`接口,就可以对它使用扩展运算符,将其转为数组. `let arr = [...iterable];`
+
+##### `yield*`
+
+`yield*`后面跟的是一个可遍历的结构,会调用该结构的遍历器接口
+
+``` javascript
+let generator = function* (){
+    yield 1;
+    yield* [2,3,4];
+    yield 5;
+};
+
+let iterator = generator();
+
+console.log(iterator.next());   //Object { value=1,  done=false}
+console.log(iterator.next());   //Object { value=2,  done=false}
+console.log(iterator.next());   //Object { value=3,  done=false}
+console.log(iterator.next());   //Object { value=4,  done=false}
+console.log(iterator.next());   //Object { value=5,  done=false}
+console.log(iterator.next());   //Object { value=undefined,  done=true}
+```
+
+##### 其他场合
+
+数组的遍历会调用遍历器接口,所以任何接受数组作为参数的场合,其实都调用了遍历器接口
+- `for...of`
+- `Array.from`
+- `Map,Set,WeakMap,WeakSet`
+- `Promise.all`
+- `Promise.race`
+
+#### 字符串的Iterator接口
+字符串也是一个类数组对象,也原生具有`Iterator`接口
+
+``` javascript
+let str = 'hello';
+
+let iterator = str[Symbol.iterator]();
+
+console.log(iterator.next());   //Object { value=h,  done=false}
+console.log(iterator.next());   //Object { value=e,  done=false}
+console.log(iterator.next());   //Object { value=l,  done=false}
+console.log(iterator.next());   //Object { value=l,  done=false}
+console.log(iterator.next());   //Object { value=o,  done=false}
+console.log(iterator.next());   //Object { value=undefined,  done=true}
+```
+
+>提示:调用`Symbol.iterator`方法返回一个遍历器对象,该对象具有`next`方法,从而实现遍历.
+
+#### Iterator接口与Generator函数
+`Symbol.iterator`方法的最简单实现
+
+``` javascript
+let iterable = {};
+
+iterable[Symbol.iterator] = function* () {
+    yield 1;
+    yield 2;
+    yield 3;
+};
+
+console.log([...iterable]); //[1,2,3]
+
+//简洁写法
+
+
+let obj = {
+    *[Symbol.iterator]() {
+        yield 'hello',
+        yield 'world'
+    }
+};
+
+for(let value of obj){
+    console.log(value); //hello world
+}
+
+let objIter = obj[Symbol.iterator]();
+console.log(objIter.next());    //Object { value="hello",  done=false}
+console.log(objIter.next());    //Object { value="world",  done=false}
+console.log(objIter.next());    //Object { done=true,  value=undefined} 
+```
+
+#### 遍历器对象的方法
+
+- next
+- return
+- throw
+
+
