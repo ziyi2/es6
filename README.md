@@ -2400,7 +2400,7 @@ let iterable = {
     1: 'b',
     2: 'c',
     length: 3,
-    [Symbol.iterator]: Array.prototype[Symbol.iterator] //Symbol.iterator方法直接饮用数组的Iterator接口
+    [Symbol.iterator]: Array.prototype[Symbol.iterator] //Symbol.iterator方法直接引用数组的Iterator接口
 };
 
 
@@ -2419,7 +2419,7 @@ let iterable = {
     b: 'b',
     c: 'c',
     length: 3,
-    [Symbol.iterator]: Array.prototype[Symbol.iterator] //Symbol.iterator方法直接饮用数组的Iterator接口
+    [Symbol.iterator]: Array.prototype[Symbol.iterator] //Symbol.iterator方法直接引用数组的Iterator接口
 };
 
 
@@ -2590,5 +2590,276 @@ console.log(objIter.next());    //Object { done=true,  value=undefined}
 - next
 - return
 - throw
+
+>提示: 在`Generator`中讲解.
+
+
+#### `for...of`
+
+##### Array
+
+`for...of`循环内部调用的是数据接口的`Symbol.iterator`方法.
+
+``` javascript
+let arr = [1,2];
+let iterator = arr[Symbol.iterator]();
+
+for(let value of arr){  //原生调用iterator接口
+    console.log(value); //1 2
+}
+
+for(let value of iterator){
+    console.log(value); //1 2
+}
+```
+
+以上两种写法相等,需要注意的是,`for...of`可以替代数组中的`forEach`方法.
+
+同时,在`ES5`中的`for...in`方法可以获取键名,但是没办法获取键值,在ES6中使用`for...of`方法可以获取键值.
+
+
+``` javascript
+let arr = [1,2];
+
+for(let value of arr){  //获取键值
+    console.log(value); //1 2
+}
+
+
+for(let key in arr){    //获取键名(数组中的索引,对象中的属性名)
+    console.log(key);   //0 1
+}
+```
+同时,`for...of`在数组的遍历器接口中只返回具有数字索引的属性,这一点跟`for...in`循环也有差异
+
+``` javascript
+let arr = [1,2];
+
+arr.name = 'arr';
+
+
+for(let value of arr){  //只遍历数组的索引
+    console.log(value); //1 2
+}
+
+
+for(let key in arr){    //当然是遍历所有属性名
+    console.log(key);   //0 1 name
+}
+```
+
+##### Set和Map
+`Set`和`Map`和`Array`一样,原生具有`Iterator`接口,可以直接使用`for...of`循环.
+
+
+``` javascript
+let name = new Set(['ziyi2','ziyi3']);
+
+for(let e of name){ 
+    console.log(e);  //ziyi2 ziyi3
+}
+
+let person = new Map();
+
+person.set('name','ziyi2');
+person.set('age',23);
+
+for(let [key,value] of person){
+    console.log(key + ':' + value); //name:ziyi2 age:23
+}
+
+```
+
+>提示: Set结构遍历时,返回的是一个值,而Map结构遍历时,返回的是一个具有键值对的数组.
+
+##### 计算生成的数据结构
+以下三个方法调用后返回遍历器对象
+
+- entries 
+遍历`[键名,键值]`组成的数组.`Map`结构的`Iterator`接口,默认就是调用`entries`方法.
+- keys
+遍历所有的键名
+- values
+遍历所有的键值
+
+``` javascript
+let arr = [1,2];
+arr.name = 'arr';
+
+for(let key of arr.keys()){ //arr.keys()返回的是数组的遍历器对象
+    console.log(key);       //0 1
+}
+
+console.log(arr.keys().next()); //Object { value=0,  done=false}
+
+for(let value of arr){
+    console.log(value);     //1,2
+}   
+
+//该方法类似于以上遍历
+for(let value of arr.values()){ //arr.values is not a function
+    console.log(value);
+}
+
+
+for(let pair of arr.entries()){
+    console.log(pair);  //[0, 1] [1, 2]
+}
+```
+
+##### 类数组对象
+
+`DOM NodeList`对象,`arguments`对象都是类数组对象.
+
+```javascript
+let ps = document.querySelectorAll('p');
+
+
+for(let p of ps){   //给所有的p元素添加class属性
+    p.classList.add('test');    
+}
+
+for(let key in ps){
+    console.log(key);   //0,1,2,3,4,item,length
+}
+```
+
+当然并不是所有的类数组对象都具有`iterator`接口
+
+``` JavaScript
+let obj = {
+    0: 'a',
+    1: 'b',
+    length:2
+};
+
+
+for(let key in obj){
+    console.log(key);   //0,1,length
+}
+
+for(let value of obj){
+    console.log(value); //obj is not iterable
+}
+```
+
+此时有两种方法可以使它拥有`iterator`接口
+
+``` javascript
+let obj = {
+    0: 'a',
+    1: 'b',
+    length:2,
+    [Symbol.iterator]: Array.prototype[Symbol.iterator] //部署Symbol.iterator属性
+};
+
+
+for(let value of obj){
+    console.log(value); //a b
+}
+
+
+let arr1 = {
+    0: 'a',
+    1: 'b',
+    length: 2
+};
+
+for(let value of Array.from(arr1)){ //将类数组对象转化为数组
+    console.log(value); //a b
+}
+```
+##### 比较
+
+`for...in`循环的缺点
+- 遍历数组的键名时以字符串'0','1'.'2'作为键名
+- 不仅遍历数字键名,还会遍历其他键,甚至包括原型链上的键(此时使用Object.keys()比较合适).
+- 以任意顺序遍历键名
+
+`for...of`优点
+
+- 可以与`break`,`continue`,`return`配合使用
+- 提供了遍历所有数据结构的统一操作接口
+
+``` javascript
+let obj = {
+    0: 'a',
+    1: 'b',
+    length:2
+};
+
+for(let value in obj){
+    console.log(value); //0
+    break;              //中断遍历,也可以! 
+}
+
+for(let value of Array.from(obj)){
+    console.log(value); //a
+
+    if(value === 'a'){
+        break;          //中断遍历
+    }
+}
+```
+
+### Generator
+
+`Generator`函数是`ES6`提供的一种异步编程解决方案，语法行为与传统函数完全不同。`Generator`函数是一个状态机，封装了多个内部状态。执行`Generator`函数会返回一个遍历器对象，也就是说，`Generator`函数除了状态机，还是一个遍历器对象生成函数。返回的遍历器对象，可以依次遍历`Generator`函数内部的每一个状态。
+形式上，`Generator`函数是一个普通函数，但是有两个特征。一是，`function`关键字与函数名之间有一个星号；二是，函数体内部使用`yield`语句，定义不同的内部状态（`yield`语句在英语里的意思就是“产出”）。
+
+
+``` javascript
+function* personGen(){
+    yield 'ziyi2';      //此时有ziyi2,xx3和ending三个状态
+    yield 'xx3';
+    return 'ending';
+}
+
+let p = personGen();    //Generator函数返回的是一个遍历器对象
+
+console.log(p.next());  //Object { value="ziyi2",  done=false}
+console.log(p.next());  //Object { value="xx3",  done=false}
+console.log(p.next());  //Object { value="ending",  done=true}
+console.log(p.next());  //Object { value=undefined,  done=true}
+```
+调用`Generator`函数后，该函数并不执行，返回的也不是函数运行结果，而是一个指向内部状态的指针对象，也就是上一节介绍的遍历器对象`Iterator Object`.必须调用遍历器对象的`next`方法，使得指针移向下一个状态,每次调用`next`方法，内部指针就从函数头部或上一次停下来的地方开始执行，直到遇到下一个`yield`语句（或`return`语句）为止。换言之，`Generator`函数是分段执行的，`yield`语句是暂停执行的标记，而`next`方法可以恢复执行。
+
+第一次调用，`Generator`函数开始执行，直到遇到第一个`yield`语句为止。`next`方法返回一个对象，它的`value`属性就是当前`yield`语句的值`hello`，`done`属性的值`false`，表示遍历还没有结束。
+
+第二次调用，`Generator`函数从上次`yield`语句停下的地方，一直执行到下一个`yield`语句。`next`方法返回的对象的`value`属性就是当前`yield`语句的值`world`，`done`属性的值`false`，表示遍历还没有结束。
+
+一直执行到`return`语句（如果没有`return`语句，就执行到函数结束）。`next`方法返回的对象的`value`属性，就是紧跟在`return`语句后面的表达式的值（如果没有`return`语句，则`value`属性的值为`undefined`），`done`属性的值`true`，表示遍历已经结束。
+
+`ES6`没有规定，`function`关键字与函数名之间的星号，写在哪个位置。下面写法都是可以的,一般采用第二种
+
+``` javascript
+function * f(){};
+function* f(){};
+function *f(){};
+function*f(){};
+```
+
+#### yield
+由于`Generator`函数返回的遍历器对象，只有调用`next`方法才会遍历下一个内部状态，所以其实提供了一种可以暂停执行的函数。`yield`语句就是暂停标志。
+
+- 遇到`yield`语句，就暂停执行后面的操作(比如有一个加法操作,没有遇到该`yield`之前是不会执行该语句的,等于手动的'惰性求值')，并将紧跟在`yield`后面的那个表达式的值，作为返回的对象的`value`属性值。
+- 下一次调用`next`方法时，再继续往下执行，直到遇到下一个`yield`语句。
+- 如果没有再遇到新的`yield`语句，就一直运行到函数结束，直到`return`语句为止，并将`return`语句后面的表达式的值，作为返回的对象的`value`属性值。
+- 如果该函数没有`return`语句，则返回的对象的`value`属性值为`undefined`。
+
+`yield`语句与`return`语句既有相似之处，也有区别。相似之处在于，都能返回紧跟在语句后面的那个表达式的值。区别在于每次遇到`yield`，函数暂停执行，下一次再从该位置继续向后执行，而`return`语句不具备位置记忆的功能。一个函数里面，只能执行一次（或者说一个）`return`语句，但是可以执行多次（或者说多个）`yield`语句。正常函数只能返回一个值，因为只能执行一次`return`；`Generator`函数可以返回一系列的值，因为可以有任意多个`yield`。从另一个角度看，也可以说`Generator`生成了一系列的值，这也就是它的名称的来历（在英语中，`generator`这个词是“生成器”的意思）。
+
+`Generator`函数可以不用`yield`语句，这时就变成了一个单纯的暂缓执行函数
+
+``` javascript
+function * fGen(){
+    console.log('此时执行');
+}
+
+let f = fGen();     //此时并没有输出
+f.next();           //此时执行
+```
+
+`yield`语句不能用在普通函数里,否则会报错
 
 
