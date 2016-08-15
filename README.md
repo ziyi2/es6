@@ -2745,7 +2745,7 @@ for(let value of obj){
 
 此时有两种方法可以使它拥有`iterator`接口
 
-``` javascript
+``` JavaScript
 let obj = {
     0: 'a',
     1: 'b',
@@ -2781,7 +2781,7 @@ for(let value of Array.from(arr1)){ //将类数组对象转化为数组
 - 可以与`break`,`continue`,`return`配合使用
 - 提供了遍历所有数据结构的统一操作接口
 
-``` javascript
+``` JavaScript
 let obj = {
     0: 'a',
     1: 'b',
@@ -2808,7 +2808,7 @@ for(let value of Array.from(obj)){
 形式上，`Generator`函数是一个普通函数，但是有两个特征。一是，`function`关键字与函数名之间有一个星号；二是，函数体内部使用`yield`语句，定义不同的内部状态（`yield`语句在英语里的意思就是“产出”）。
 
 
-``` javascript
+``` JavaScript
 function* personGen(){
     yield 'ziyi2';      //此时有ziyi2,xx3和ending三个状态
     yield 'xx3';
@@ -2832,7 +2832,7 @@ console.log(p.next());  //Object { value=undefined,  done=true}
 
 `ES6`没有规定，`function`关键字与函数名之间的星号，写在哪个位置。下面写法都是可以的,一般采用第二种
 
-``` javascript
+``` JavaScript
 function * f(){};
 function* f(){};
 function *f(){};
@@ -2851,7 +2851,7 @@ function*f(){};
 
 `Generator`函数可以不用`yield`语句，这时就变成了一个单纯的暂缓执行函数
 
-``` javascript
+``` JavaScript
 function * fGen(){
     console.log('此时执行');
 }
@@ -2863,3 +2863,15 @@ f.next();           //此时执行
 `yield`语句不能用在普通函数里,否则会报错
 
 
+```JavaScript
+function * fGen(){
+    (function(){        //不能把yield放在普通函数里
+        yield 'ziyi2';
+        yield 'xx3';
+        return 'ending'
+    })();
+}
+
+
+let f = fGen(); //error 报错
+```
