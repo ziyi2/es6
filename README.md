@@ -2876,4 +2876,3 @@ function * fGen(){
 let f = fGen(); //error 报错
 ```
 
-1
