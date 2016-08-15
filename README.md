@@ -2876,3 +2876,38 @@ function * fGen(){
 let f = fGen(); //error 报错
 ```
 
+#### Iterator接口关系
+对象的`Symbol.iterator`方法相当于一个遍历器生成函数,调用该函数会返回该对象的遍历器对象. 由于`Generator`函数就是遍历器生成函数,因此把`Generator`赋值给对象的`Symbol.iterator`属性,从而使得该对象具有`Iterator`接口.
+
+``` javascript
+let myIterable = {};
+
+myIterable[Symbol.iterator] = function* (){
+    yield 1;
+    yield 2;
+    yield 3;
+};
+
+console.log([...myIterable]);   //[1, 2, 3]
+```
+
+当然`Generator`函数执行后返回的遍历器对象本身也具有`Symbol.iterator`属性,执行后和自身相同
+
+``` javascript
+function* gen(){
+    yield 1;
+    yield 2;
+};
+
+let g = gen();
+
+let s = g[Symbol.iterator]();
+
+let bool = s ===  g;
+console.log(bool);  //true
+
+console.log(g.next());  //Object { value=1,  done=false}
+console.log(s.next());  //Object { value=2,  done=false}
+```
+
+
