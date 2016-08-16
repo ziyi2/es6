@@ -2910,4 +2910,103 @@ console.log(g.next());  //Object { value=1,  done=false}
 console.log(s.next());  //Object { value=2,  done=false}
 ```
 
+#### next方法的参数
+#### for...of循环
+一旦`next`方法的返回对象的`done`属性为`true`,`for...of`循环就会中止,且不包含该返回的对象,所以`return`语句返回的值就不会被遍历
 
+``` javascript
+function *f(){
+    yield 1;
+    yield 2;
+    yield 3;
+    yield 4;
+    return 6;
+}
+
+for(let value  of f()){
+    console.log(value); //1 2 3 4
+}
+```
+
+>提示: 使用`for...of`语句时不需要再使用`next`方法.
+
+`for...of`,扩展运算符`...`,解构赋值和`Array.from`方法内部调用的,都是遍历器接口,所以可以将Generator函数返回的Iterator对象作为参数.
+
+``` javascript
+function *f(){
+    yield 1;
+    yield 2;
+    yield 3;
+    return 4;
+    yield 5;
+
+}
+
+
+console.log([...f()]);          //[1, 2, 3]
+console.log(Array.from(f()));   //[1, 2, 3]
+
+let [...arr] = f();
+console.log(arr);               //[1, 2, 3]
+
+let [x,y,z] = f();
+console.log(x);                 //1
+console.log(y);                 //2
+console.log(z);                 //3
+
+
+for(let value of f()){
+    console.log(value);         //1 2 3
+}   
+
+```
+
+通过Generator函数为原生的对象加上`Iterator`接口
+
+``` JavaScript
+function* objEntries(obj){
+    let keys = Reflect.ownKeys(obj);    //返回所有的属性,不管属性名是`Symbol`还是字符串,不管是否可枚举.
+
+    for(let key of keys){
+        yield [key,obj[key]];
+    }
+}
+
+
+let person = {one:'ziyi2',two:'ziyi3',three:'ziyi4'};
+
+for(let [key,value] of objEntries(person)){
+    console.log(`${key}:${value}`);
+}
+
+//one:ziyi2
+//two:ziyi3
+//three:ziyi4
+```
+
+以上原生的`person`对象是不具备`Iterator`接口的,通过`Generator`函数为它加上遍历器接口,就可以使用`for...of`遍历了.当然加上遍历器的另外一个方法是将`Generator`函数加到对象`Symbol.iterator`属性上面.
+
+``` javascript
+function* objEntries(){
+    //let keys = Reflect.ownKeys(this); //返回所有的属性,不管属性名是`Symbol`还是字符串,不管是否可枚举.
+
+    let keys = Object.keys(this);       //返回对象自身的所有可枚举的属性的键名
+
+    for(let key of keys){
+        yield [key,this[key]];
+    }
+}
+
+
+let person = {one:'ziyi2',two:'ziyi3',three:'ziyi4'};
+
+person[Symbol.iterator] = objEntries;
+
+for(let [key,value] of person){
+    console.log(`${key}:${value}`);
+}
+
+//one:ziyi2
+//two:ziyi3
+//three:ziyi4
+```
