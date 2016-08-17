@@ -2824,9 +2824,9 @@ console.log(p.next());  //Object { value=undefined,  done=true}
 ```
 调用`Generator`函数后，该函数并不执行，返回的也不是函数运行结果，而是一个指向内部状态的指针对象，也就是上一节介绍的遍历器对象`Iterator Object`.必须调用遍历器对象的`next`方法，使得指针移向下一个状态,每次调用`next`方法，内部指针就从函数头部或上一次停下来的地方开始执行，直到遇到下一个`yield`语句（或`return`语句）为止。换言之，`Generator`函数是分段执行的，`yield`语句是暂停执行的标记，而`next`方法可以恢复执行。
 
-第一次调用，`Generator`函数开始执行，直到遇到第一个`yield`语句为止。`next`方法返回一个对象，它的`value`属性就是当前`yield`语句的值`hello`，`done`属性的值`false`，表示遍历还没有结束。
+第一次调用，`Generator`函数开始执行，直到遇到第一个`yield`语句为止。`next`方法返回一个对象，它的`value`属性就是当前`yield`语句的值`ziyi2`，`done`属性的值`false`，表示遍历还没有结束。
 
-第二次调用，`Generator`函数从上次`yield`语句停下的地方，一直执行到下一个`yield`语句。`next`方法返回的对象的`value`属性就是当前`yield`语句的值`world`，`done`属性的值`false`，表示遍历还没有结束。
+第二次调用，`Generator`函数从上次`yield`语句停下的地方，一直执行到下一个`yield`语句。`next`方法返回的对象的`value`属性就是当前`yield`语句的值`xx3`，`done`属性的值`false`，表示遍历还没有结束。
 
 一直执行到`return`语句（如果没有`return`语句，就执行到函数结束）。`next`方法返回的对象的`value`属性，就是紧跟在`return`语句后面的表达式的值（如果没有`return`语句，则`value`属性的值为`undefined`），`done`属性的值`true`，表示遍历已经结束。
 
@@ -3056,6 +3056,9 @@ i.throw(new Error('出错了!'));
 
 >提示: 不要混淆遍历器对象的`throw`方法和全局的`throw`命令。上面代码的错误，是用遍历器对象的`throw`方法抛出的，而不是用`throw`命令抛出的。后者只能被函数体外的`catch`语句捕获。
 
+
+如果`Generator`函数内部没有部署`try...catch`代码,那么遍历器对象抛出的异常将会被外部的`catch`代码块捕获
+
 ``` javascript
 var g = function* () {
   try {
@@ -3079,4 +3082,144 @@ try {
 ```
 函数体外的`catch`语句块捕获了抛出`a`错误以后,就不会在继续`try`代码块里面剩余的语句了.
 
+``` javascript
+let g = function* () {
+    while(true) {
+        yield;
+        console.log('内部捕获',e);
+    }
+};
 
+
+let i = g();
+console.log(i.next());  //Object { done=false,  value=undefined}
+
+try {
+    i.throw('a');
+    i.throw('b');
+} catch (e) {
+    console.log('外部捕获',e);
+}
+
+//外部捕获 a
+
+```
+
+>提示: 如果外部和函数内部都没有部署`try...catch`代码块,那么程序将会报错,中断执行.
+
+``` javascript
+let gen = function* () {
+    try {
+        yield console.log('a');
+    } catch (e) {
+        console.log('error');
+    }
+
+    yield console.log('b');
+    yield console.log('c');
+};
+
+
+let g = gen();
+
+g.next();       //a
+g.throw();      //error 
+g.next();       //b
+g.next();       //c
+console.log(g.next());  //Object { done=true,  value=undefined}
+g.throw();      //uncaught exception: undefined
+```
+
+```javascript
+let gen = function* () {
+    try {
+        yield console.log('a');
+    } catch (e) {
+        console.log('error');
+    }
+
+    yield console.log('b');
+    yield console.log('c');
+};
+
+
+let g = gen();
+
+g.next();       //a
+g.next();       //b
+
+try {
+    throw new Error();
+} catch(e) {
+    g.next();   //c
+}
+
+```
+
+`Generator`函数体外抛出的错误,可以在函数体内捕获,反过来,`Generator`函数体内抛出的错误,也可以被函数体外的`catch`捕获
+
+``` javascript
+let gen = function* () {
+    let x = yield 3;
+    let y = x.toUpperCase();
+    yield y;
+};
+
+let it = gen();
+
+console.log(it.next());   //Object { value=3,  done=false}
+
+try {
+    it.next(43);
+} catch (err) {
+    console.log(err);     //x.toUpperCase is not a function
+}
+
+```
+
+`yield`句本身没有返回值，或者说总是返回`undefined`。`next`方法可以带一个参数，该参数就会被当作上一个`yield`语句的返回值.
+
+``` javascript
+let gen = function* () {
+    let x = yield 3;        //本身没有返回值,返回的总是undefined
+    let y = x.toUpperCase();
+    yield y;
+};
+
+let it = gen();
+
+console.log(it.next());     //Object { value=3,  done=false}
+console.log(it.next());     //TypeError: x is undefined 
+```
+
+一旦`Generator`执行过程中抛出错误,且没有被内部捕获,就不会再执行下去了,如果还调用`next`,将返回`{value:undeinfed,done:true}`
+
+``` javascript
+let gen = function* () {
+    yield 3;
+    console.log('throw an error');
+    throw new error('error:next is done');
+    yield 2;
+    yield 3;
+}
+
+let g = gen();
+
+try {
+    console.log(g.next());   //Object { value=3,  done=false}
+} catch(e) {
+    console.log('first next error' );
+}
+
+try {
+    console.log(g.next());
+} catch(e) {
+    console.log('second next error' );  //throw an error second next error
+}
+
+try {
+    console.log(g.next());  // Object { done=true,  value=undefined}
+} catch(e) {
+    console.log('third next error' );
+}
+```
