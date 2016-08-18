@@ -3652,3 +3652,52 @@ for (task of doStuff()) {
 }
 
 ```
+
+### Promise
+#### Promise概述
+- 对象的状态不受外界影响
+`Promise`对象代表一个异步操作,有三种状态,`Pending(待决)`,`Resolved(成功)`和 `Rejected(失败)`.只有异步操作的结果，可以决定当前是哪一种状态，任何其他操作都无法改变这个状态,这也是Promise这个名字的由来，它的英语意思就是“承诺”，表示其他手段无法改变。
+
+- 一旦状态改变，就不会再变，任何时候都可以得到这个结果
+
+`Promise`对象的状态改变，只有两种可能：从`Pending`变为`Resolved`和从`Pending`变为`Rejected`,只要这两种情况发生，状态就凝固了，不会再变了，会一直保持这个结果
+
+
+`Promise`也有一些缺点。首先，无法取消`Promise`，一旦新建它就会立即执行，无法中途取消。其次，如果不设置回调函数，`Promise`内部抛出的错误，不会反应到外部。第三，当处于`Pending`状态时，无法得知目前进展到哪一个阶段（刚刚开始还是即将完成）。
+如果某些事件不断地反复发生，一般来说，使用`stream`模式是比部署`Promise`更好的选择
+
+#### 用法
+
+
+```javascript
+let promise = new Promise((resolve,reject) => {
+
+    //异步操作
+    
+    // f(function(){
+    //  if(err){
+    //      reject(error);
+    //  } 
+    //  resolve(value);
+    // })
+    
+    //操作成功
+    resolve(value); //status:Pending -> Resolved
+
+    //操作失败
+    reject(error);  //status:Pending -> Rejected    
+
+});
+
+//Promise实例生成以后，可以用then方法分别指定Resolved状态和Reject状态的回调函数。
+promise.then(value => {
+    //success
+},error => {
+    //failed
+})
+
+```
+
+>提示: 在`Promise`对象中的`resolve`和`reject`会将参数(这里是`value`和`error`)传递出去,而`then`中的成功和失败方法都会接受相应的参数
+
+
