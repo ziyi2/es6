@@ -3425,5 +3425,230 @@ for(let value of iterTree(tree)) {
 }
 ```
 
+##### Generator作为对象的属性
+
+```javascript
+let obj = {
+
+    f: function* () {
+        yield 1;
+        yield 2;
+        yield 3;
+    },
+
+    *g() {              //简写方式 *表示这个属性是Generator函数
+        yield 1;
+        yield 2;
+    }
+}
 
 
+for(let value of obj.f()){
+    console.log(value); //1 2 3
+}
+
+for(let value of obj.g()){
+    console.log(value); //1 2
+}
+```
+
+`Generator`函数总是返回一个遍历器，`ES6`规定这个遍历器是`Generator`函数的实例，也继承了`Generator`函数的`prototype`对象上的方法
+
+``` javascript
+function* g() {}
+g.prototype.say = () => 'hi';
+let obj = g();  //返回的遍历器obj是g的实例
+console.log(obj.say()); //hi
+```
+
+>提示: 不能把`Generator`函数当做普通的构造函数,并且不能和new命令结合
+
+
+##### 状态机
+
+```javascript
+//ES5
+let ticking = true;
+
+let clock = () => {
+    if(ticking) {
+        console.log('Tick!');
+    } else {
+        console.log('Tock!');
+    }
+
+    ticking = !ticking;
+}
+
+clock();    //'Tick!'
+clock();    //'Tock!'
+clock();    //'Tick!'
+
+//ES6
+let status = function*() {
+    while(true) {
+        console.log('Tick!');
+        yield;
+        console.log('Tock!');
+        yield;
+    }
+}
+
+
+let x = status();
+
+x.next();   //'Tick!'
+x.next();   //'Tock!'
+x.next();   //'Tick!'
+```
+
+
+##### 协程
+
+协程（coroutine）是一种程序运行的方式，可以理解成“协作的线程”或“协作的函数”。协程既可以用单线程实现，也可以用多线程实现。前者是一种特殊的子例程，后者是一种特殊的线程。
+
+（1）协程与子例程的差异
+
+传统的“子例程”（subroutine）采用堆栈式“后进先出”的执行方式，只有当调用的子函数完全执行完毕，才会结束执行父函数。协程与其不同，多个线程（单线程情况下，即多个函数）可以并行执行，但是只有一个线程（或函数）处于正在运行的状态，其他线程（或函数）都处于暂停态（suspended），线程（或函数）之间可以交换执行权。也就是说，一个线程（或函数）执行到一半，可以暂停执行，将执行权交给另一个线程（或函数），等到稍后收回执行权的时候，再恢复执行。这种可以并行执行、交换执行权的线程（或函数），就称为协程。
+
+从实现上看，在内存中，子例程只使用一个栈（stack），而协程是同时存在多个栈，但只有一个栈是在运行状态，也就是说，协程是以多占用内存为代价，实现多任务的并行。
+
+（2）协程与普通线程的差异
+
+不难看出，协程适合用于多任务运行的环境。在这个意义上，它与普通的线程很相似，都有自己的执行上下文、可以分享全局变量。它们的不同之处在于，同一时间可以有多个线程处于运行状态，但是运行的协程只能有一个，其他协程都处于暂停状态。此外，普通的线程是抢先式的，到底哪个线程优先得到资源，必须由运行环境决定，但是协程是合作式的，执行权由协程自己分配。
+
+由于ECMAScript是单线程语言，只能保持一个调用栈。引入协程以后，每个任务可以保持自己的调用栈。这样做的最大好处，就是抛出错误的时候，可以找到原始的调用栈。不至于像异步操作的回调函数那样，一旦出错，原始的调用栈早就结束。
+
+Generator函数是ECMAScript 6对协程的实现，但属于不完全实现。Generator函数被称为“半协程”（semi-coroutine），意思是只有Generator函数的调用者，才能将程序的执行权还给Generator函数。如果是完全执行的协程，任何函数都可以让暂停的协程继续执行。
+
+如果将Generator函数当作协程，完全可以将多个需要互相协作的任务写成Generator函数，它们之间使用yield语句交换控制权。
+
+##### 应用
+- 异步操作的同步化表达
+
+```javascript
+function* ajax() {
+    let result = yield request('/url'); //result就是next传入的参数response
+    let resp = JSON.parse(result);
+    console.log(resp.value);
+}
+
+
+function request(url) {
+    makeAjax(url,(response => {
+        it.next(response);
+    }))
+}
+
+let it = ajax();
+it.next();
+```
+
+使用`yield`语句可以手动逐行读取文件
+
+```javascript
+function* numbers() {
+  let file = new FileReader("numbers.txt");
+  try {
+    while(!file.eof) {
+      yield parseInt(file.readLine(), 10);  //转换为十进制
+    }
+  } finally {
+    file.close();
+  }
+}
+```
+
+- 解决回调金字塔
+
+回调金字塔
+```javascript
+step1(function (value1) {
+  step2(value1, function(value2) {
+    step3(value2, function(value3) {
+      step4(value3, function(value4) {
+        // Do something with value4
+      });
+    });
+  });
+});
+```
+
+采用`Promise`写法
+
+```javascript
+Q.fcall(step1)
+  .then(step2)
+  .then(step3)
+  .then(step4)
+  .then(function (value4) {
+    // Do something with value4
+  }, function (error) {
+    // Handle any error from step1 through step4
+  })
+  .done();
+  ```
+
+`Generator`写法
+
+```javascript
+function* longRunningTask() {
+  try {
+    var value1 = yield step1();
+    var value2 = yield step2(value1);
+    var value3 = yield step3(value2);
+    var value4 = yield step4(value3);
+    // Do something with value4
+  } catch (e) {
+    // Handle any error from step1 through step4
+  }
+}
+```
+
+然后，使用一个函数，按次序自动执行所有步骤
+
+```javascript
+scheduler(longRunningTask());
+
+function scheduler(task) {
+  setTimeout(function() {
+    var taskObj = task.next(task.value);
+    // 如果Generator函数未结束，就继续调用
+    if (!taskObj.done) {
+      task.value = taskObj.value
+      scheduler(task);
+    }
+  }, 0);
+}
+```
+
+注意，`yield`语句是同步运行，不是异步运行（否则就失去了取代回调函数的设计目的了）。实际操作中，一般让`yield`语句返回`Promise`对象。
+
+```javascript
+var Q = require('q');
+
+function delay(milliseconds) {
+  var deferred = Q.defer();
+  setTimeout(deferred.resolve, milliseconds);
+  return deferred.promise;
+}
+
+function* f(){
+  yield delay(100);
+};
+```
+
+- 作为数据结构
+
+``` javascript
+function *doStuff() {
+  yield fs.readFile.bind(null, 'hello.txt');
+  yield fs.readFile.bind(null, 'world.txt');
+  yield fs.readFile.bind(null, 'and-such.txt');
+}
+
+for (task of doStuff()) {
+  // task是一个函数，可以像回调函数那样使用它
+}
+
+```
