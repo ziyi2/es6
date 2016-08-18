@@ -3223,3 +3223,207 @@ try {
     console.log('third next error' );
 }
 ```
+
+#####  Generator.prototype.return 
+
+`return`方法用来终结遍历状态,就好像在`Generator`函数中遇到了`return`
+
+``` javascript
+let gen = function* () {
+    yield 1;
+    yield 2;
+    yield 3;
+}
+
+let g = gen();
+
+console.log(g.next());      // Object { value=1,  done=false}
+console.log(g.return('4')); // Object { value="4",  done=true}
+console.log(g.next());      // Object { done=true,  value=undefined}
+```
+
+>提示: 如果`return`方法不传入参数,那么返回的是`undefined`
+
+
+如果`Generator`函数内部有`try...finally`代码块
+
+``` javascript
+let gen = function* () {
+    yield 1;
+    try {
+        yield 2;
+        yield 3;
+    } finally {
+        yield 4;
+        yield 5;
+    }
+    yield 6;
+}
+
+let g = gen();
+
+console.log(g.next());      //Object { value=1,  done=false}
+console.log(g.next());      //Object { value=2,  done=false}
+console.log(g.return('7')); //Object { value="7",  done=true}
+console.log(g.next());      //Object { value=4,  done=false}
+console.log(g.next());      //Object { value=5,  done=false}
+```
+
+>提示:调用`return`后,先执行`finally`中的代码块,执行完后再执行`return`方法
+
+##### `yield*`
+
+在`Generator`函数内部要调用`Generator`函数是不行的,此时可以用`yield*`来代替
+
+``` javascript
+function* f() {
+    yield 1;
+    yield 2;
+    yield* g();
+}
+
+function* g() {
+    yield 3;
+    yield 4;
+}
+
+
+for(let value of f()){
+    console.log(value); //1 2 3 4
+}
+```
+
+如果`yield`后面是一个遍历器对象,那么需要`yield`命令后面加上`*`,表明它返回的是一个遍历器对象,否则返回的不是遍历值,而是该遍历器对象
+
+``` javascript
+function* f() {
+    yield 1;
+    yield 2;
+    yield* g();         //返回遍历值            
+    yield g();          //这里返回的是遍历器对象
+}
+
+function* g() {
+    yield 3;
+    yield 4;
+}
+
+
+for(let value of f()){
+    console.log(value); //1 2 3 4  Generator {}
+}
+```
+
+遍历递归效果
+
+``` javascript
+let f = (function* () {
+    yield 'hello';
+    yield 'bye';
+}());
+
+
+let g = (function* () {
+    yield 'hello forward';
+    yield* f;
+    yield 'bye end';
+}());
+
+for(let value of g) {
+    console.log(value); //'hello forward'  'hello' 'bye' 'bye end'
+}
+```
+
+以上代码等同于
+
+``` javascript
+var f = (function* () {
+    yield 'hello';
+    yield 'bye';
+}());
+
+let g_copy = (function* () {
+    yield 'hello forward';
+    for(let value of f) {
+        yield value;
+    }
+    yield 'bye end';
+
+}());
+
+for(let value of g_copy) {
+    console.log(value); //'hello forward'  'hello' 'bye' 'bye end'
+}
+```
+
+由于数组原生支持`Iterator`接口,所以可以被`yield*`遍历
+
+``` javascript
+let g = (function* () {
+    yield 'hello forward';
+    yield* ['hello','bye'];
+    yield 'bye end';
+
+}());
+
+for(let value of g) {
+    console.log(value); //'hello forward'  'hello' 'bye' 'bye end'
+}
+```
+
+>提示: 任何具有`Iterator`接口的数据接口,都可以被`yield*`遍历
+
+如果`Generator`函数中调用的`Generator`函数具有`return`语句,那么就可以在这个被调用的`Generator`函数中返回数据给调用`Generator`的`Generator`函数
+
+``` javascript
+function* f() {
+    yield 2;
+    yield 3;
+    return 'return value';
+}
+
+function* g() {
+    yield 1;
+    let r = yield* f();     //r是f()中的返回值 注意与yield中的返回值的区别
+    console.log('r:' + r); 
+    yield 4;
+}
+
+let g1 = g();
+
+
+console.log(g1.next()); // Object { value=1,  done=false}
+console.log(g1.next()); // Object { value=2,  done=false}
+console.log(g1.next()); // Object { value=3,  done=false}
+console.log(g1.next()); // r:return value  Object { value=4,  done=false}
+console.log(g1.next()); // Object { done=true,  value=undefined}
+```
+>提示: 注意与`yield`中的返回值的区别,`yield`句本身没有返回值，或者说总是返回`undefined`。`next`方法可以带一个参数，该参数就会被当作上一个`yield`语句的返回值。
+
+``` javascript
+function* iterTree(tree) {
+    if(Array.isArray(tree)) {
+        // tree.forEach(function(item,index,arr){
+        //  yield* iterTree(item);  //不能放在普通函数内!!!!
+        // })
+        
+        for(let value of tree){
+            yield* iterTree(value);
+        }
+        
+
+    } else {
+        yield tree;
+    }
+}
+
+
+const tree = [[1,2,3],4,5,[6,[7,8]]];
+
+for(let value of iterTree(tree)) {
+    console.log(value); //1 2 3 4 5 6 7 8
+}
+```
+
+
+
