@@ -3701,3 +3701,716 @@ promise.then(value => {
 >提示: 在`Promise`对象中的`resolve`和`reject`会将参数(这里是`value`和`error`)传递出去,而`then`中的成功和失败方法都会接受相应的参数
 
 
+简单的例子
+
+```javascript
+function timeOut(ms) {
+    return new Promise((resolve,reject) => {
+        setTimeout(resolve,ms,'done');
+    });
+}
+
+timeOut(5000).then((value) => {
+    console.log(value);     //done
+});
+```
+新建Promise实例的时候会立即执行
+
+```javascript
+let promise = new Promise((resolve,reject) => {
+    console.log('new promise running!');
+    resolve('resolve running!');
+});
+
+promise.then((value) => {
+    console.log(value);
+})
+
+console.log('global running!');
+
+
+
+//new promise running!
+//global running!
+//resolve running!
+```
+
+ajax实例
+
+```javascript
+var getJSON = function(url) {
+  var promise = new Promise(function(resolve, reject){
+    var client = new XMLHttpRequest();
+    client.open("GET", url);
+    client.onreadystatechange = handler;
+    client.responseType = "json";
+    client.setRequestHeader("Accept", "application/json");
+    client.send();
+
+    function handler() {
+      if (this.readyState !== 4) {
+        return;
+      }
+      if (this.status === 200) {
+        resolve(this.response);
+      } else {
+        reject(new Error(this.statusText));
+      }
+    };
+  });
+
+  return promise;
+};
+
+getJSON("/posts.json").then(function(json) {
+  console.log('Contents: ' + json);
+}, function(error) {
+  console.error('出错了', error);
+});
+```
+
+
+`resolve`函数的参数除了正常的值以外，还可能是另一个`Promise实例`
+
+`p2`的`resolve`方法将`p1`作为参数,即一个异步的操作结果返回另一个异步操作,
+**这时`p1`的状态就会传递给`p2`,`p1`的状态决定了`p2`的状态**,如果`p1`状态是`Pending`,那么`p2`的回调函数就会等待`p1`的状态改变,如果`p1`的状态已经是`Resolved`或`Rejected`,那么`p2`的回调函数就会立刻执行
+
+
+此时p2会等待p1的状态执行完毕在执行
+
+``` javascript
+let p1 = new Promise((resolve,reject) => {
+    setTimeout(() => resolve('p1 resolve!'),1000);
+});
+
+let p2 = new Promise((resolve,reject) => {
+    setTimeout(() => resolve(p1), 500);
+});
+
+p2.then(value => console.log(value));   //p1 resolve
+```
+
+
+此时p2立即执行,因为p1的状态先执行完毕
+
+```javascript
+let p1 = new Promise((resolve,reject) => {
+    setTimeout(() => resolve('p1 resolve!'),500);
+});
+
+let p2 = new Promise((resolve,reject) => {
+    setTimeout(() => resolve(p1), 1000);
+});
+
+p2.then(value => console.log(value));   //p1 resolve
+
+```
+
+`p1`的状态是`Rejected`,所以`p2`执行后也是触发`Rejected`状态对应的回调函数
+
+```javascript
+let p1 = new Promise((resolve,reject) => {
+    setTimeout(() => reject('p1 reject!'),500);
+});
+
+let p2 = new Promise((resolve,reject) => {
+    setTimeout(() => resolve(p1), 1000);    //resolve接受一个Promise实例作为参数
+});
+
+p2.then(value => console.log('resolve ' + value),   
+        error => console.log('reject ' + error));   //reject p1 reject
+```
+
+#### Promise.prototype.then
+
+为`Promise`实例添加状态改变时对应的回调函数,第一个参数`Resolve`状态对应的回调函数,第二个参数是`Rejected`状态对应的回调函数,也可以进行链式调用,比如`ajax`请求时,连续需要发送好几个`ajax`,但是后一个`ajax`需要在前一个`ajax`请求成功时才触发,此时非常适用!
+
+采用链式`then`,前一个异步操作在执行回调函数时,如果返回的还是一个`Promise`对象(另外一个异步操作),那么后一个回调函数就会等待该`Promise`对象的状态的改变从而触发相应的回调函数.
+
+
+``` javascript
+let p = new Promise((resolve,reject) => {
+    resolve('resolve data!');
+});
+
+p.then((data) => {
+    console.log(data);  //resolve data
+    return p;
+}).then((data) => {
+    console.log(data);  //resolve data
+    return p;
+}).then((data) => {
+    console.log(data);  //resolve data;
+});
+```
+>提示: 通常两个异步操作如果同时执行,它们的回调函数的触发时间的先后是不一定的,要看异步操作的执行状态时间,但是采用链式的形式可以指定一组按照顺序执行的异步操作
+
+
+#### Promise.prototype.catch
+
+如果异步操作抛出错误，状态就会变为`Rejected`，就会调用`catch`方法指定的回调函数，处理这个错误
+
+``` javascript
+let p = new Promise((resolve,reject) => {
+    throw new Error('promise Error!');
+});
+
+//方法一
+p.then((val) => console.log('resolve:'))
+ .catch((err) => console.log('err:' + err));
+//err:Error: promise Error!
+
+//方法二,等同于方法一
+p.then((val) => console.log('resolve:'))
+ .then(null,(err) => console.log('err:' + err));
+//err:Error: promise Error!
+```
+
+`Promise`一旦状态发生变化时不能被改变的
+
+```javascript
+let promise = new Promise((resolve,reject) => {
+    resolve('resolve data!');
+    reject('reject data!');         //等于没有设置
+    throw new Error('error data!'); //等于没有抛出
+});
+
+
+promise.then((value) => console.log(value),
+             (error) => console.log(error))
+       .catch(err => console.log(err));
+
+//resolve data!
+```
+
+
+尽管返回的仍然是`promise`,只要任何一个出错,都会被最后的`catch`捕获
+
+``` javascript
+let promise = new Promise((resolve,reject) => {
+    throw new Error('error data!');
+});
+
+
+promise.then(() => promise)
+       .then(() => promise)
+       .catch(err => console.log(err)); //Error: error data!
+```
+
+一般来说，不要在`then`方法里面定义`Rejected`状态的回调函数（即`then`的第二个参数），总是使用`catch`方法
+
+
+``` javascript
+let promise = new Promise((resolve,reject) => {
+    reject('reject data!');
+});
+
+//bad
+promise.then((data) => console.log(data),
+             (err)  => console.log(err));   //reject data!
+
+//good 
+promise.then((data) => console.log(data))
+       .catch((err) => console.log(err));   //reject data!
+```
+>提示:使用`catch`不仅能够捕获状态`Rejected`,还能捕获异常错误.因此建议使用`catch`而不是使用`then`方法的第二个参数
+
+
+`Nodejs`有一个`unhandledRejection`事件，专门监听未捕获的`reject`错误。
+
+```javascript
+process.on('unhandledRejection', function (err, p) {
+  console.error(err.stack)
+});
+```
+>提示: `p`是报错的`Promise`实例
+
+
+`catch`方法返回的还是一个`Promise`对象
+
+``` javascript
+let promise = new Promise((resolve,reject) => {
+    reject(x+4);
+});
+
+
+promise.then((value) => console.log('resolve1:' + value))
+       .catch((err)  => console.log('err1 ' + err))     //err1 ReferenceError: x is not defined
+       .then((value) => console.log('resolve2'))        //resolve2
+       // .catch((err)  => console.log('err2 ' + x))
+       // .catch((err)  => console.log('err3 ' + x));
+
+```
+
+如果没有错误,则会跳过`catch`方法
+
+```javascript
+let promise = new Promise((resolve,reject) => {
+    resolve('resolve');
+});
+
+
+promise      
+       .catch((err)  => console.log('err2 ' + err)) 
+       .then((value) => console.log('resolve1:' + value));
+
+//resolve1: resolve
+```
+
+`catch`方法还能再抛出错误
+
+```javascript
+let promise = new Promise((resolve,reject) => {
+    reject(x+4);
+});
+
+
+promise.then((value) => console.log('resolve1:' + value))
+       .catch((err)  => console.log('err1 ' + x))       
+       .catch((err)  => console.log('err2 ' + err));    //err2 ReferenceError: x is not defined
+```
+
+>提示: 第一个`catch`有错误后在第二个`catch`中抛出
+
+
+#### Promise.all
+
+接收一个数组作为参数或者该参数具有`Iterator`接口,每一个成员都必须是`Promise`实例.
+
+以下实例中只有`p,p1,p2`的状态都变成`Resolved`,`ps`的状态才会变成`Resolved`,改参数的所有`Promise`实例的返回值都将以数组的形式传递给`ps`的回调函数
+
+```javascript
+let p = new Promise((resolve,reject) => {
+    resolve('resolve:p');
+});
+
+let p1 = new Promise((resolve,reject) => {
+    resolve('resolve:p1');
+});
+
+let p2 = new Promise((resolve,reject) => {
+    resolve('resolve:p3');
+});
+
+let ps = Promise.all([p,p1,p2]);
+ps.then((values) => console.log(values));   //["resolve:p", "resolve:p1", "resolve:p3"]
+```
+只要有一个状态是`Rejected`,`ps`的状态就变成`Rejected`,此时第一个被`Rejecte`的实例的返回值会传递给`ps`的回调函数
+
+```
+let p = new Promise((resolve,reject) => {
+    resolve('resolve:p');
+});
+
+
+let p1 = new Promise((resolve,reject) => {
+    reject('reject:p1');
+});
+
+
+
+let p2 = new Promise((resolve,reject) => {
+    resolve('resolve:p3');
+});
+
+
+
+let ps = Promise.all([p,p1,p2]);
+ps.then((values) => console.log(values))    
+  .catch((err) => console.log(err));    //reject:p1
+
+```
+
+#### Promise.race
+
+race,比赛的意思,所以和all正好相反的是,只要有一个实例率先改变状态,`ps`的状态就跟着改变了,那个率先改变的`Promise`实例的返回值,就传递给`ps`的回调函数,这种方法可以用作超时处理
+
+``` javascript
+let p = new Promise((resolve,reject) => {
+    setTimeout(() => {
+        resolve('task 1')
+    },1000);
+});
+
+
+let p1 = new Promise((resolve,reject) => {
+    setTimeout(() => {
+        reject('time out 2')
+    },2000);
+});
+
+let ps = Promise.race([p,p1]);
+ps.then((value) => console.log('resolve:' + value)) //resolve:task 1
+  .catch((err) => console.log('err:' + err));       //err:time out 2
+```
+
+>提示:如果任务一是一个`ajax`请求,那么我们就可以设定多少时间没有处理就拒绝处理,返回超时提醒
+
+#### Promise.resolve
+
+将现有对象转换为`Promise`对象
+
+```javascript
+let p = Promise.resolve('resolve value');
+
+//等同于
+//let p = new Promise((resolve) => resolve('resolve value'));
+
+p.then((value) => console.log(value));  //resolve value
+
+
+
+let p1 = Promise.resolve($.ajax('url'));
+
+//将Jquery生成的deferred对象转为一个新的Promise对象
+```
+
+`$.ajax()`操作完成后，如果使用的是低于1.5.0版本的`jQuery`，返回的是`XHR`对象，你没法进行链式操作；如果高于1.5.0版本，返回的是`deferred`对象，可以进行链式操作,具体详见[jQuery的deferred对象详解](http://www.ruanyifeng.com/blog/2011/08/a_detailed_explanation_of_jquery_deferred_object.html)
+
+
+- 参数是Promise实例 
+- 参数是thenable对象
+
+```javascript
+let obj = {
+    then(resolve,reject) {
+        resolve('resolve value');
+    }
+};
+let p = Promise.resolve(obj);
+p.then((value) => console.log(value));  //resolve value
+```
+>提示: `Promise.resolve`方法会将这个对象转为`Promise`对象，然后就立即执行`obj`对象的`then`方法.该方法执行后,对象`p`的状态就变为`resolved`
+
+- 参数不是具有then方法的对象，或根本就不是对象
+
+```javascript
+let p = Promise.resolve('resolve');
+p.then((value) => console.log(value));  //resolve
+```
+
+- 不带任何参数
+
+```javascript
+setTimeout(() => console.log('setTimeout'),0);
+
+Promise.resolve().then(() => console.log('promise'));
+
+console.log('global');
+
+//global        立即执行
+//promise       本轮'事件循环'结束时执行
+//setTimeout    下一轮'事件循环'开始时执行
+
+```
+>提示: 关于事件循环可以查看[JavaScript 运行机制详解：再谈Event Loop](http://www.ruanyifeng.com/blog/2014/10/event-loop.html)
+
+
+#### Promise.reject
+
+与`resove`方法对应
+
+```javascript
+let p = Promise.reject('reject!');
+p.catch((err) => console.log(err)); //reject
+```
+
+#### done
+该方法总是处于回调链的尾端,保证任何可能的错误最终都可以捕捉到
+
+```javascript
+asyncFunc()
+  .then(f1)
+  .catch(r1)
+  .then(f2)
+  .done();
+
+Promise.prototype.done = function (onFulfilled, onRejected) {
+  this.then(onFulfilled, onRejected)
+    .catch(function (reason) {
+      // 抛出一个全局错误
+      setTimeout(() => { throw reason }, 0);
+    });
+};
+```
+
+#### finally
+
+`finally`方法用于指定不管`Promise`对象最后状态如何，都会执行的操作
+
+```javascript
+server.listen(0)
+  .then(function () {
+    // run test
+  })
+  .finally(server.stop);
+
+Promise.prototype.finally = function (callback) {
+  let P = this.constructor;
+  return this.then(
+    value  => P.resolve(callback()).then(() => value),
+    reason => P.resolve(callback()).then(() => { throw reason })
+  );
+};
+```
+
+#### 应用
+
+##### 加载图片
+
+```javascript
+const preloadImage = function (path) {
+  return new Promise(function (resolve, reject) {
+    var image = new Image();
+    image.onload  = resolve;
+    image.onerror = reject;
+    image.src = path;
+  });
+};
+```
+
+##### `Generator`函数与`Promise`的结合
+
+
+``` javascript
+function getFoo() {
+    return new Promise((resolve,reject) => {
+        resolve('foo');
+    })
+}
+
+
+let g = function* () {
+    try {
+        let foo = yield getFoo(); //返回Promise对象
+        console.log(foo);
+    } catch(e) {
+        console.log(e);
+    }
+};
+
+
+function run(generator) {
+    let it = generator();
+
+    function go(result) {
+        if(result.done) return result.value;    //result.value:undefined
+
+        return result.value
+            .then((value) => {
+                return go(it.next(value));  //it.next('foo')  go(Object { done=true,  value=undefined})
+            })
+            .catch((error) => {
+                return go(it.throw(error));
+            });
+    }
+
+    go(it.next());  //Object { value=Promise,  done=false}
+
+}
+
+run(g);
+```
+
+异步操作按顺序执行
+
+```javascript
+//按顺序执行
+
+let p = new Promise((resolve,reject) => {
+    reject('reject:p');
+});
+
+let p1 = new Promise((resolve,reject) => {
+    resolve('resolve:p1');
+});
+
+let p2 = new Promise((resolve,reject) => {
+    resolve('resolve:p2');
+});
+
+
+function* g() {
+    try {
+        yield p;
+        yield p1;
+        yield p2;
+        //可以采用yield* [p,p1,p2]代替
+    } catch(e) {
+        console.log(e);
+    }
+}
+
+
+function run(generator) {
+    let it = generator();
+
+    let result = it.next();
+
+    while(!result.done) {
+        result.value.then((value) => console.log('resolve:' + value))
+                    .catch((err)  => console.log('reject:' + err));
+
+        result = it.next();         
+    }
+}
+
+run(g);
+
+//resolve:resolve:p1
+//resolve:resolve:p2
+//reject:reject:p
+
+```
+
+
+只要有一个是拒绝状态,就返回拒绝状态
+
+```javascript
+let p = new Promise((resolve,reject) => {
+    reject('reject:p');
+});
+
+let p1 = new Promise((resolve,reject) => {
+    resolve('resolve:p1');
+});
+
+let p2 = new Promise((resolve,reject) => {
+    resolve('resolve:p2');
+});
+
+
+function* g() {
+    try {
+        let value = yield  Promise.all([p,p1,p2]);
+        console.log('try:' + value);        
+    } catch(e) {
+        console.log('catch:' + e);      //catch:reject:p
+    }
+}
+
+
+全部状态是`Resolved`,则返回`Resolved`
+
+``` javascript
+function run(generator) {
+    let it = generator();
+    it.next().value.then((value) => it.next(value))
+                   .catch((err)  => it.throw(err));
+}
+
+run(g);
+```
+
+
+let p = new Promise((resolve,reject) => {
+    resolve('resolve:p');
+});
+
+let p1 = new Promise((resolve,reject) => {
+    resolve('resolve:p1');
+});
+
+let p2 = new Promise((resolve,reject) => {
+    resolve('resolve:p2');
+});
+
+
+function* g() {
+    try {
+        let value = yield  Promise.all([p,p1,p2]);
+        console.log('try:' + value);    //try:resolve:p,resolve:p1,resolve:p2   
+    } catch(e) {
+        console.log('catch:' + e);      
+    }
+}
+
+
+function run(generator) {
+    let it = generator();
+    it.next().value.then((value) => it.next(value))
+                   .catch((err)  => it.throw(err));
+}
+
+run(g);
+
+```
+
+
+### 异步操作和Async
+
+#### Promise
+
+```javascript
+fs.readFile(fileA, function (err, data) {
+  fs.readFile(fileB, function (err, data) {
+    // ...
+  });
+});
+```
+
+Promise可以解决`callback hell`
+
+```javascript
+var readFile = require('fs-readfile-promise');
+
+readFile(fileA)
+.then(function(data){
+  console.log(data.toString());
+})
+.then(function(){
+  return readFile(fileB);   //可以继续返回Promise对象
+})
+.then(function(data){
+  console.log(data.toString());
+})
+.catch(function(err) {
+  console.log(err);
+});
+
+```
+
+缺陷:`Promise`的最大问题是代码冗余，原来的任务被`Promise`包装了一下，不管什么操作，一眼看去都是一堆`then`，原来的语义变得很不清楚。
+
+
+#### Generator
+
+协程
+
+```javascript
+function* asyncTasks() {
+    let value = yield new Promise((resolve) => resolve('task A'));
+    console.log(value); //task A
+}
+
+let task = asyncTasks();
+task.next().value.then(value => task.next(value)); 
+```
+
+协程遇到`yield`命令就暂停，等到执行权返回，再从暂停的地方继续往后执行。它的最大优点，就是代码的写法非常像同步操作，如果去除`yield`命令，简直一模一样。
+
+
+##### Generator函数的数据交换和错误处理
+
+`Generator`函数可以暂停执行和恢复执行，这是它能封装异步任务的根本原因。除此之外，它还有两个特性，使它可以作为异步编程的完整解决方案：函数体内外的数据交换和错误处理机制。
+`next`方法返回值的`value`属性，是`Generator`函数向外输出数据；`next`方法还可以接受参数，这是向`Generator`函数体内输入数据。
+
+```javascript
+function* gen(x) {
+    try {
+        var y = yield x + 2;　　　 
+    } catch(e) {
+        console.log(e);
+    }
+    return y;
+}
+
+let g = gen(2);
+console.log(g.next());  //Object { value=4,  done=false}
+
+//此时传入给y的值是5,也就是传入给上一个yield的返回值(作为上个阶段异步任务的返回结果)
+console.log(g.next(5)); //Object { value=5,  done=true}
+```
+
+    
+
