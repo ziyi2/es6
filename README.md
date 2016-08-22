@@ -5405,3 +5405,70 @@ class Foo {
   static prop = 1;
 }
 ```
+
+#### new.target
+
+`new.target`属性返回`new`命令作用于的那个构造函数(当前类),如果构造函数不是通过new命令调用的，`new.target`会返回`undefined`
+
+```javascript
+class Person {
+    constructor(name,age) {
+        console.log(new.target === Person); //true
+        this.name = name;
+        this.age = age;
+    }
+}
+
+let obj = new Person('ziyi2',23);
+```
+
+>提示: 子类继承父类时,`new.target`返回子类
+
+```javascript
+class Person {
+    constructor(name,age) {
+        console.log(new.target);    //Father()
+        this.name = name;
+        this.age = age;
+    }
+}
+
+class Father extends Person {
+    constructor() {
+        super();
+    }
+}
+
+let p = new Father('ziyi2',23);
+```
+
+
+
+
+```javascript
+class Person {
+    constructor(name,age) {
+        if(new.target === Person) {
+            throw new Error('error');   
+        }
+        this.name = name;
+        this.age = age;
+    }
+}
+
+class Father extends Person {
+    constructor() {
+        super();
+    }
+}
+
+let p = new Person('ziyi2',23); //Error: error
+```
+
+#### Mixin模式的实现
+ 
+略.
+
+
+
+
