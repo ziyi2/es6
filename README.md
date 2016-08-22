@@ -4410,5 +4410,998 @@ console.log(g.next());  //Object { value=4,  done=false}
 console.log(g.next(5)); //Object { value=5,  done=true}
 ```
 
-    
+ ##### 异步任务
 
+``` javascript
+function* gen() {
+    try {
+        var y = yield new Promise((resolve,reject) => resolve('resolve task')); 
+    } catch(e) {
+        console.log(e);
+    }
+    console.log(y);
+}
+
+
+let result = gen();
+
+result.next().value
+      .then(data => {
+        return data +　' add some content';
+      })
+      .then(data => {
+        result.next(data);  //resolve task add some content
+      });
+```
+
+
+#### Thunk
+
+传值调用(C语言就是这么干的)
+
+``` javascript
+function f(m) {     //m=7
+    return m*2;
+}
+
+let x= 2;
+f(x+5); //7*2 传入f的参数是先经过计算后的7
+```
+
+传名调用
+
+``` javascript
+function f(m,b) {   //m=x+5
+    return b*2;
+}
+
+let x= 2;
+f(x+5,7);   //传入f的参数先不计算,因为根本没用到,先计算就造成了性能消耗
+```
+
+##### Thunk函数传名调用
+
+``` javascript
+let x = 5;
+
+let thunk = () => x + 5;
+
+function f(thunk) {
+    return thunk() * 2; //传入之后才计算
+}
+
+console.log(f(thunk));  //20
+```
+
+##### JavaScript中的Thunk
+
+`JavaScript`本身是传值调用的.在`JavaScript`语言中，`Thunk`函数替换的不是表达式，而是多参数函数，将其替换成单参数的版本，且只接受回调函数作为参数.
+
+``` javascript
+//多参数,其中最后一个是回调函数
+fs.readFile(fileName,callback);
+
+let thunk = fileName => {
+    return (callback) => fs.readFile(fileName,callback); 
+}
+
+
+let readFileThunk = thunk(fileName);
+readFileThunk(callback);    //只有一个回调函数作为参数了
+```
+
+
+`Thunk`函数转换器
+
+```javascript
+//ES5
+var Thunk = function(fn) {
+    return function() {
+        //将arguments类数组转换成真正的数组
+        var args = Array.prototype.slice.call(arguments);
+        return function (callback) {
+            args.push(callback);    //这里就可以使用数组的方法了
+            return fn.apply(this,args);
+        }   
+    }
+}
+
+
+//ES6
+let Thunk = (fn) => {   //fn是需要转换的多参数带有回调函数的函数
+    return (...args) => {
+        return (callback) => {
+            return fn.call(this,...args,callback);
+        }
+    }
+}
+
+//使用方法
+let readFileThunk = Thunk(fs.readFile);
+readFileThunk(fileName)(callback);
+```
+
+##### Thunkify模块
+
+生产环境的转换器,使用`Thunkify`模块
+
+```javascript
+npm install thunkify
+```
+
+使用方法
+
+```javascript
+const thunkify = require('thunkify');
+const fs = require('fs');
+
+let read = thunkify(fs.readFile);
+read('app.txt')(callback);
+```
+
+##### Thunk函数的应用
+
+首先来看看`Generator`函数的自动执行
+
+``` javascript
+function* gen() {
+    //...
+}
+
+let g = gen();
+let res = g.next();
+
+while(!res.done) {
+    console.log(res.value);
+    res = g.next();
+}
+```
+需要注意的是这种方法不适合异步操作,如果必须保证前一步执行完才可以进行后一步操作,那么Thunk函数就非常有用了
+
+
+
+const fs = require('fs');
+const thunkify = require('thunkify');
+const readFile = thunkify(fs.readFile);
+//使用方法 readFile(fileName)(callback);
+
+``` javascript
+function* gen() {
+    let f1 = yield readFile('1.txt');   //返回的是有一个回调函数作为参数的函数
+    console.log(f1.toString());
+    let f2 = yield readFile('2.txt');
+    console.log(f2.toString()); 
+}
+
+
+let g = gen();
+
+let f1 = g.next();
+
+f1.value(function(err,data){
+    if(err) throw err;
+    let f2 = g.next(data);
+    f2.value(function(err,data){
+        if(err) throw err;
+        g.next(data);
+    });
+});
+```
+
+
+##### Thunk函数的自动流程管理
+
+自动执行Generator函数
+
+```javascript
+const fs = require('fs');
+const thunkify = require('thunkify');
+const readFile = thunkify(fs.readFile);
+//使用方法 readFile(fileName)(callback);
+
+function* gen() {
+    let f1 = yield readFile('1.txt');   //返回的是Thunk函数,该函数只有一个参数就是回调函数
+    let f2 = yield readFile('2.txt');
+    let f3 = yield readFile('2.txt');
+    let f4 = yield readFile('2.txt');
+}
+
+
+function run(fn) {
+    let gen = fn();
+
+    function next(err,data) {   //next是Thunk的回调函数
+        let result = gen.next(data);
+        if(result.done) return;
+        result.value(next);
+    }
+}
+
+run(gen);   
+```
+
+>提示:使用这种方法跟在`yield`后面的必须是thunk函数,当然`Promise`也可以做到这个
+
+
+#### co
+
+该模块可以让你不用编写`Generator`函数的执行器
+
+```javascript
+const fs = require('fs');
+const thunkify = require('thunkify');
+const readFile = thunkify(fs.readFile);
+const co = require('co');
+
+function* gen() {
+    let f1 = yield readFile('1.txt');   //返回的是Thunk函数,该函数只有一个参数就是回调函数
+    let f2 = yield readFile('2.txt');
+    let f3 = yield readFile('2.txt');
+    let f4 = yield readFile('2.txt');
+}
+
+co(gen);    //自动执行Generator函数
+
+//返回的是一个Primise对象
+co(gen).then(() => {
+    console.log('Generator done!');
+})
+```
+
+
+##### 原理
+
+前面说过，`Generator`就是一个异步操作的容器。它的自动执行需要一种机制，当异步操作有了结果，能够自动交回执行权。两种方法可以做到这一点
+
+- 回调函数,将异步操作包装成`Thunk`函数,在回调函数中交回执行权
+- `Promise`对象,将异步操作包装成`Promise`对象，用`then`方法交回执行权
+
+`co`模块其实就是将两种自动执行器（`Thunk`函数和`Promise`对象），包装成一个模块。使用`co`的前提条件是，`Generator`函数的`yield`命令后面，只能是`Thunk`函数或`Promise`对象
+
+##### 基于Promise对象的自动执行
+
+```javascript
+const fs = require('fs');
+
+//之前是使用了Thunk函数,返回的是回调函数,这里返回Promise对象
+let readFile = function(fileName) {
+    return new Promise((resolve,reject) => {
+        fs.readFile(fileName,(err,data) => {
+            if(err) {
+                return reject(err);
+            }
+            resolve(data);
+        });
+    });
+}
+
+
+
+function* gen() {
+    let f1 = yield readFile('1.txt');   //返回的是Thunk函数,该函数只有一个参数就是回调函数
+    let f2 = yield readFile('2.txt');
+    console.log(f1.toString() + f2.toString());
+}
+
+
+//手动执行
+let g = gen();
+g.next().value.then((data) => {
+    g.next().value.then((data) => {
+        g.next(data);
+    });
+});
+
+
+//自动执行器
+function run(gen) {
+    let g = gen();
+
+    function next(data) {
+        let result = g.next(data);
+        if(result.done) return result.value;
+        result.value.then((data) => next(data));
+    }
+
+    next();
+}
+
+run(gen);
+```
+
+##### 处理并发的异步操作
+
+`co`支持并发的异步操作，即允许某些操作同时进行，等到它们全部完成，才进行下一步
+
+```javascript
+// 数组的写法
+co(function* () {
+  var res = yield [
+    Promise.resolve(1),
+    Promise.resolve(2)
+  ];
+  console.log(res);
+}).catch(onerror);
+
+// 对象的写法
+co(function* () {
+  var res = yield {
+    1: Promise.resolve(1),
+    2: Promise.resolve(2),
+  };
+  console.log(res);
+}).catch(onerror);
+```
+
+上面的代码允许并发三个`somethingAsync`异步操作，等到它们全部完成，才会进行下一步
+
+```javascript
+co(function* () {
+  var values = [n1, n2, n3];
+  yield values.map(somethingAsync);
+});
+
+function* somethingAsync(x) {
+  // do something async
+  return y
+}
+```
+
+#### async
+
+```javascript
+var fs = require('fs');
+
+var readFile = function (fileName) {
+  return new Promise(function (resolve, reject) {
+    fs.readFile(fileName, function(error, data) {
+      if (error) reject(error);
+      resolve(data);
+    });
+  });
+};
+
+var gen = function* (){
+  var f1 = yield readFile('/etc/fstab');
+  var f2 = yield readFile('/etc/shells');
+  console.log(f1.toString());
+  console.log(f2.toString());
+};
+```
+
+如果写成`async`函数
+
+```javascript
+var asyncReadFile = async function (){
+  var f1 = await readFile('/etc/fstab');
+  var f2 = await readFile('/etc/shells');
+  console.log(f1.toString());
+  console.log(f2.toString());
+};
+```
+将`*`替换成`async`,`yield`替换成`await`
+
+- 内置执行器。
+`Generator`函数的执行必须靠执行器，所以才有了`co`模块，而`async`函数自带执行器。也就是说，`async`函数的执行，与普通函数一模一样，只要一行。
+
+```javascript
+var result = asyncReadFile();
+```
+
+- 更好的语义
+`async`和`await`，比起`*`和`yield`，语义更清楚了。`async`表示函数里有异步操作，`await`表示紧跟在后面的表达式需要等待结果
+
+- 更广的适用性
+`co`模块约定，`yield`命令后面只能是`Thunk`函数或`Promise`对象，而`async`函数的`await`命令后面，可以是`Promise`对象和原始类型的值（数值、字符串和布尔值，但这时等同于同步操作
+
+- 返回值是`Promise`
+`async`函数的返回值是`Promise`对象，这比`Generator`函数的返回值是`Iterator`对象方便多了
+
+略.
+
+
+
+### Class
+
+```javascript
+'use strict';
+
+//ES5
+function Person(name,age) {
+    this.name = name;
+    this.age = age;
+}
+
+Person.prototype.sayInfo = function() {
+    console.log(this.name + ':' + this.age);
+}
+
+
+var p = new Person('ziyi2',23);
+p.sayInfo();    //ziyi2:23
+
+
+
+//ES6
+class People {
+    //构造方法
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+    //不需要,分隔
+    //类的所有方法都定义在类的prototype属性上
+    sayInfo() {
+        console.log(`${this.name}:${this.age}`);
+    }
+
+    //等同于
+    // People.prototype.sayInfo = function() {
+    // console.log(`${this.name}:${this.age}`);
+    // }
+}
+
+
+let p1 = new People('ziyi3',35);
+p1.sayInfo();   //ziyi3:35
+```
+
+添加新的方法到原型对象
+
+```JavaScript
+Object.assign(People.prototype, {
+    sayName() {
+        console.log(this.name);
+    },
+
+    sayAge() {
+        console.log(this.age);
+    }
+});
+
+
+p1.sayAge();    ///35
+```
+
+基本性质与`ES5`不一致的是,类的内部所有定义的方法,都是不可枚举的
+```javascript
+//Object.keys返回对象自身的所有可枚举的属性的键名
+let keys = Object.keys(People.prototype);
+console.log(keys);  //["sayName", "sayAge"] sayInfo不可枚举
+
+keys = Object.keys(People);
+console.log(keys);  //[] 
+
+keys = Object.getOwnPropertyNames(People);
+console.log(keys);  //["prototype", "length", "name"]
+
+keys = Object.getOwnPropertyNames(People.prototype);
+console.log(keys);  //["constructor", "sayInfo", "sayName", "sayAge"]
+```
+属性名可以采用表达式的形式
+
+```javascript
+let x = 'ziyi2';
+let property = () => `Greeting ${x}`;
+
+class People {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    [property()]() {
+        console.log(this.name);
+    }
+
+    
+}
+
+
+let p1 = new People('ziyi3',35);
+
+p1[property()]();       //ziyi3
+p1['Greeting ziyi2'](); //ziyi3
+```
+
+
+#### class不存在变量提升
+
+```javascript
+let x = 'ziyi2';
+
+new People();   //can't access lexical declaration `People' before initialization
+
+class People {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+```
+>提示:这样可以保证子类在父类之后定义
+
+继承
+
+```javascript
+let x = 'ziyi2';
+
+class People {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+}
+
+class Father extends People {
+    sayName() {
+        console.log(this.name);
+    }
+}
+
+let p = new Father('ziyi2',23);
+p.sayName();    //ziyi2
+```
+
+#### class表达式
+
+`Class`也可以使用表达式的形式定义
+
+
+```javascript
+const P = class People {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    sayName() {
+        console.log(`${this.name} : ${this.age}`);
+    }
+}
+
+let p = new P('ZIYI2',34);
+p.sayName();    //ZIYI2 : 34
+```
+
+>提示:此时类的名字是`P`而不是`People`,`People`在内部代码可用,指代当前类
+
+
+
+```javascript
+const P = class {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    sayName() {
+        console.log(`${this.name} : ${this.age}`);
+    }
+}
+
+let p = new P('ZIYI2',34);
+p.sayName();        //ZIYI2 : 34
+```
+
+>提示:可以省略People
+
+
+
+#### 私有方法
+
+采用`_`命令的函数当做私有函数
+```javascript
+const P = class {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    //私有方法,此时外部仍然可以调用这个方法,这种命令方式是自我的约定
+    _sayName() {
+        console.log(`${this.name} : ${this.age}`);
+    }
+}
+
+let p = new P('ZIYI2',34);
+p._sayName();       //ZIYI2 : 34
+```
+
+导出的时候如果第三方无法轻易获取,也可以当做私有方法,`bar`和`snaf`都是`Symbol`值，导致第三方无法获取到它们，因此达到了私有方法和私有属性的效果
+
+```javascript
+const bar = Symbol('bar');
+const snaf = Symbol('snaf');
+
+export default subclassFactory({
+
+  // 共有方法
+  foo (baz) {
+    this[bar](baz);
+  }
+
+  // 私有方法
+  [bar](baz) {
+    return this[snaf] = baz;
+  }
+
+  // ...
+});
+```
+
+#### 严格模式
+
+类和模块的内部，默认就是严格模式，所以不需要使用`use strict`指定运行模式。只要你的代码写在类或模块之中，就只有严格模式可用。
+考虑到未来所有的代码，其实都是运行在模块之中，所以ES6实际上把整个语言升级到了严格模式
+
+
+#### name 
+
+```javascript
+class P {}
+console.log(P.name);    //P
+```
+
+#### class继承
+
+使用`extends`关键字实现继承
+
+```javascript
+class Person {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    sayInfo() {
+        console.log(`${this.name} : ${this.age}`);
+    }
+}
+
+
+class Father extends Person     //此时和父类一模一样
+
+let f = new Father('father',56);
+f.sayInfo();    //father : 56
+```
+
+`super`关键字用来指代父类的构造函数
+
+```javascript
+class Person {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    sayInfo() {
+        //console.log(`${this.name} : ${this.age}`);
+        return `${this.name} : ${this.age}`
+    }
+}
+
+
+class Father extends Person {
+    constructor(name,age,job) {
+        super(name,age);    //调用父类的构造函数
+        this.job = job;
+    } 
+
+    sayFatherInfo() {
+        console.log(`${super.sayInfo()} : ${this.job}`);    //调用父类的sayInfo()
+    }
+
+}
+
+let f = new Father('father',56,'doctor');
+f.sayFatherInfo();  //father : 56 : doctor
+```
+
+子类必须在constructor方法中调用`super`方法,否则会报错,因为子类没有自己的`this`对象,而是继承父类的`this`对象,如果不调用`super`方法,子类就得不到this对象
+
+```javascript
+class Person {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    sayInfo() {
+        //console.log(`${this.name} : ${this.age}`);
+        return `${this.name} : ${this.age}`
+    }
+}
+
+
+class Father extends Person {
+    constructor(name,age,job) {
+        
+    } 
+}
+
+let f = new Father();   //|this| used uninitialized in Father class constructor
+```
+
+>提示:`ES5`的继承，实质是先创造子类的实例对象this，然后再将父类的方法添加到`this`上面（`Parent.apply(this)`）。`ES6`的继承机制完全不同，实质是先创造父类的实例对象`this`（所以必须先调用`super`方法），然后再用子类的构造函数修改`this`
+
+如果子类不定义`constructor`方法,会被默认添加
+
+```JavaScript
+class Person {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    sayInfo() {
+        console.log(`${this.name} : ${this.age}`);
+        //return `${this.name} : ${this.age}`
+    }
+}
+
+
+class Father extends Person {}
+
+//等同于
+// class Father extends Person {
+//  constructor(...args) {
+//      super(...args);
+//  }
+// }
+
+let f = new Father('ziyi2',23); 
+f.sayInfo();    //ziyi2 : 23
+```
+
+由于子类的`this`是继承自父类的`this`对象,所以必须是先调用`super`后才能使用`this`,否则会报错
+
+```javascript
+class Person {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    sayInfo() {
+        console.log(`${this.name} : ${this.age}`);
+        //return `${this.name} : ${this.age}`
+    }
+}
+
+
+class Father extends Person {
+    constructor(...args) {
+        this.name = 23; //|this| used uninitialized in Father class constructor
+        super(...args);
+    }
+}
+
+let f = new Father('ziyi2',23); 
+```
+
+```javascript
+class Person {
+    constructor(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    sayInfo() {
+        console.log(`${this.name} : ${this.age}`);
+        //return `${this.name} : ${this.age}`
+    }
+}
+
+
+class Father extends Person {
+    constructor(...args) {
+        super(...args);
+    }
+}
+
+let f = new Father('ziyi2',23); 
+
+
+console.log(f instanceof Father);   //true
+console.log(f instanceof Person);   //true 与ES5行为一致
+```
+
+
+#### prototype和__proto__
+
+- prototype
+子类的__proto__属性，表示构造函数的继承，总是指向父类
+- __proto__
+子类prototype属性的__proto__属性，表示方法的继承，总是指向父类的prototype属性
+
+```javascript
+class Person {}
+class Father extends Person {}
+
+console.log(Father.__proto__ === Person)    //true
+console.log(Father.prototype.__proto__=== Person.prototype);    //true
+```
+
+
+#### Extends的继承目标
+
+只要`B`有`prototype`属性,就能被`A`继承
+
+```javascript
+class A extends B {}
+```
+
+#### Object.getPrototypeOf()
+
+从子类上获取父类
+
+```javascript
+class B {}
+class A extends B {}
+let bool = Object.getPrototypeOf(A) === B;
+console.log(bool);  //true
+```
+
+#### super
+
+- 作为函数调用时（即`super(...args)`），`super`代表父类的构造函数
+- 作为对象调用时（即`super.prop`或`super.method()`），`super`代表父类。注意，此时`super`即可以引用父类实例的属性和方法，也可以引用父类的静态方法
+
+
+#### 原生构造函数的继承
+
+- Boolean
+- Number
+- String
+- Array
+- Date
+- Function
+- RegExp
+- Error
+- Object
+
+继承原生的构造函数
+
+``` javascript
+class MyArray extends Array {
+  constructor(...args) {
+    super(...args);
+  }
+}
+
+var arr = new MyArray();
+arr[0] = 12;
+arr.length // 1
+
+arr.length = 0;
+arr[0] // undefined
+```
+
+#### getter和setter
+
+```javascript
+class MyClass {
+  constructor() {
+    // ...
+  }
+  get prop() {
+    return 'getter';
+  }
+  set prop(value) {
+    console.log('setter: '+value);
+  }
+}
+
+let inst = new MyClass();
+
+inst.prop = 123;
+// setter: 123
+
+inst.prop
+// 'getter'
+```
+
+#### Class的Generator方法
+
+`Foo`类的`Symbol.iterator`方法前有一个星号，表示该方法是一个`Generator`函数。`Symbol.iterator`方法返回一个`Foo`类的默认遍历器，`for...of`循环会自动调用这个遍历器。
+
+```javascript
+class Foo {
+  constructor(...args) {
+    this.args = args;
+  }
+  * [Symbol.iterator]() {
+    for (let arg of this.args) {
+      yield arg;
+    }
+  }
+}
+
+for (let x of new Foo('hello', 'world')) {
+  console.log(x);
+}
+// hello
+// world
+```
+
+#### Class的静态属性和实例属性
+
+静态属性指的是`Class`本身的属性，即`Class.propname`，而不是定义在实例对象（`this`）上的属性
+
+```javascript
+class B {}
+console.log(B.name);    //B
+
+B.version = 1.0;
+console.log(B.version); //1
+```
+
+`ES6`明确规定，`Class`内部只有静态方法，没有静态属性
+
+```javascript
+class B {
+    version:1.0
+}
+console.log(B.version); //bad method definition
+```
+
+`ES7`有一个静态属性的提案，目前`Babel`转码器支持
+
+```javascript
+class MyClass {
+  version = 42;
+
+  constructor() {
+    console.log(this.version); // 42
+  }
+}
+```
+
+以前，我们定义实例属性，只能写在类的constructor方法里面
+
+```javascript
+class ReactCounter extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0
+    };
+  }
+}
+```
+
+有了新的写法以后，可以不在`constructor`方法里面定义
+
+```javascript
+class ReactCounter extends React.Component {
+  state = {
+    count: 0
+  };
+}
+```
+
+`ES7`中类的静态属性只要在上面的实例属性写法前面，加上`static`关键字就可以了
+
+```javascript
+class MyClass {
+  static myStaticProp = 42;
+
+  constructor() {
+    console.log(MyClass.myProp); // 42
+  }
+}
+```
+
+
+```javascript
+// 老写法
+class Foo {
+}
+Foo.prop = 1;
+
+// 新写法
+class Foo {
+  static prop = 1;
+}
+```
