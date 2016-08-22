@@ -4289,10 +4289,6 @@ function* g() {
     }
 }
 
-
-全部状态是`Resolved`,则返回`Resolved`
-
-``` javascript
 function run(generator) {
     let it = generator();
     it.next().value.then((value) => it.next(value))
@@ -4300,9 +4296,11 @@ function run(generator) {
 }
 
 run(g);
-```
 
 
+全部状态是`Resolved`,则返回`Resolved`
+
+``` javascript
 let p = new Promise((resolve,reject) => {
     resolve('resolve:p');
 });
