@@ -4296,7 +4296,7 @@ function run(generator) {
 }
 
 run(g);
-
+```
 
 全部状态是`Resolved`,则返回`Resolved`
 
