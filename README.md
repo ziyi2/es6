@@ -1,3 +1,21 @@
+---
+title: ECMAScript 6
+date: 2016-08-04 22:31:38
+categories:
+- Stack
+- JavaScript
+tags:
+- ECMAScript 6
+- Webpack
+- NodeJs
+- ECMAScript 7
+- Babel
+---
+
+Hello ES6!本文主要介绍了一些基础的ES6语法知识,具体可以详见阮一峰大师的[ECMAScript 6入门](http://es6.ruanyifeng.com/)!
+<!-- more -->
+
+
 # ECMAScript 6
 
 ## 使用环境
@@ -619,7 +637,7 @@ const  {f1,f2,...} = require("source");
 
 ###  String扩展
 
-#### 遍历器接口
+### 遍历器接口
 
 ``` javascript
 let str = 'hello es6';
@@ -629,7 +647,7 @@ for(let codePoint of str){
 }
 ```
 
-#### at
+### at
 用于替代`charAt`方法,可以识别码点大于0xFFFF的字符.
 
 ``` javascript
@@ -637,7 +655,7 @@ let str = 'hello es6';
 str.at(0);  //h
 ```
 
-#### includes,startsWith,endsWith
+### includes,startsWith,endsWith
 
 ``` javascript
 let str = 'hello es6';
@@ -653,7 +671,7 @@ console.log(str.includes('llo',2));     //true
 ```
 
 
-#### repeat
+### repeat
 
 ``` javascript
 //repeat(copyCount)
@@ -668,7 +686,7 @@ console.log(str.repeat(-2));    //Invalid count value
 ```
 
 
-#### 模板字符串
+### 模板字符串
 
 模板字符串中的空格和换行都会被保留
 ``` javascript
@@ -749,7 +767,7 @@ const temp = infos => `
 $('#list').html(temp(infos));
 ```
 
-#### 标签模板
+### 标签模板
 
 紧跟在函数后面,该函数将被调用来处理这个模板字符串,该功能称为"标签模板"功能.这其实就是函数的一种特殊调用形式,"标签"是指函数,而模板字符串是函数的参数.
 
@@ -1398,7 +1416,7 @@ sum(...arr);            //6
 sum1(1,2,3);            //6
 ```
 
-#### 替代数组的apply方法
+### 替代数组的apply方法
 扩展运算符`...`可以展开数组,所以不需要`apply`方法将数组转为函数的参数,例如`ES5`中的写法
 
 ``` javascript
@@ -1448,7 +1466,7 @@ arr.push(...arr1);
 console.log(arr);   //[1, 2, 3, 4, 3, 4, 3, 4]
 ```
 
-#### 扩展运算符的应用
+### 扩展运算符的应用
 
 - 数组合并新写法
 
@@ -1753,7 +1771,7 @@ let arr1 = [2,1];
 Object.assign(arr,arr1);
 console.log(arr);   //[2, 1, 3, 4, 5]
 ```
-#### 用途
+### 用途
 - 为对象添加属性
 
 ``` javascript
@@ -1832,17 +1850,17 @@ let merge = (...args) => Object.assign({},...args);
  - 最后遍历所有属性名为Symbol值的属性,按照生成时间排序
 
 ### `__proto__`,Object.setPrototypeOf,Object.getPrototypeOf
-#### `__proto__`
+### `__proto__`
 `__proto__`属性（前后各两个下划线）,用来读取或设置当前对象的prototype对象.目前,所有浏览器（包括IE11）都部署了这个属性.
 
-#### Object.setPrototypeOf
+### Object.setPrototypeOf
 用来设置一个对象的`prototype`对象.它是`ES6`正式推荐的设置原型对象的方法.格式如下
 
 ```
 Object.setPrototypeOf(obj,prototype)
 ```
 
-#### Object.getPrototypeOf
+### Object.getPrototypeOf
 
 ### Objetct.keys,Objetct.values,Objetct.entries
 
@@ -1853,9 +1871,9 @@ Object.setPrototypeOf(obj,prototype)
 - `Objetct.entries (ES7)`
 遍历对象的（不含继承的）可遍历的属性的键值对,返回的是数组
 
-### Symbol
+## Symbol
 
-#### 概述
+### 概述
 `ES5`中的属性只能是字符串,在别人封装的对象的基础上,增加新的方法可能会出现重复,所以在`ES6`中新增了一种数据类型`Symbol`,也就是说在`ES6`中对象的属性可以是字符串也可以是`Symbol`类型.
 
 >提示: `ES5`中的数据类型有`Undefined`,`Null`,`Boolean`,`String`,`Number`,`Object`,在`ES6`中新增了`Symbol`.
@@ -1947,7 +1965,7 @@ f(status.success);  //1
 f(status.error);    //2 
 ```
 
-#### 属性遍历
+### 属性遍历
 
 - `Object.getOwnPropertySymbols`
 - `for...in`
@@ -1956,7 +1974,7 @@ f(status.error);    //2
 - `Object.keys`
 >提示: 注意`Object.keys`和`for...in`的区别.
 
-####  Symbol.for,Symbol.keyFor
+###  Symbol.for,Symbol.keyFor
 如果想使用同一个`Symbol`值,`Symbol.for`方法接受一个字符串作为参数,然后先搜索有没有该参数作为名称的`Symbol`值,有则返回,没有则创建一个该字符串为名称的`Symbol`值.
 
 ```javascript
@@ -1996,7 +2014,7 @@ if(!global[s]){
 module.exports = global[s]; //导出的全局变量的该属性不会被修改
 ```
 
-#### 其他方法
+### 其他方法
 - Symbol.hasInstance 
 - Symbol.isConcatSpreadable
 - Symbol.species
@@ -2009,9 +2027,9 @@ module.exports = global[s]; //导出的全局变量的该属性不会被修改
 - Symbol.toStringTag
 - Symbol.unscopables
 
-### Proxy和Reflect
+## Proxy和Reflect
 
-#### Proxy
+### Proxy
 用于修改某系操作的默认行为,可以理解为对目标对象做了拦截,访问对象之前,先执行拦截,所以可以对外界的访问行文进行过滤和改写.
 
 生成`Proxy`实例,`target`表示要拦截的目标对象,`hander`用来定制拦截行为,注意`hander`也是一个对象
@@ -2067,7 +2085,7 @@ console.log(obj.name);  //35
 ```
 
 
-#### 拦截方法
+### 拦截方法
 
 - `get(target,prop,receiver)`
 拦截对象属性的读取,最后一个参数后续说明.
@@ -2114,7 +2132,7 @@ console.log(new p(2).value);    //20
 
 >提示:`construct`方法返回的必须是一个对象,否则会报错
 
-#### Reflect
+### Reflect
 将`Object`对象的一些明显属于语言内部的方法（比如`Object.defineProperty`）,放到`Reflect`对象上.未来的新方法将只部署在Reflect对象上.
 
 修改某些`Object`方法的返回结果,让其变得更合理.比如,`Object.defineProperty(obj, name, desc)`在无法定义属性时,会抛出一个错误,而`Reflect.defineProperty(obj, name, desc)`则会返回`false`
@@ -2160,7 +2178,7 @@ Proxy(target, {
 
 上面代码中,`Proxy`方法拦截`target`对象的属性赋值行为.它采用`Reflect.set`方法将值赋值给对象的属性,然后再部署额外的功能
 
-#### Reflect对象的方法
+### Reflect对象的方法
 - `Reflect.get(target, name, receiver)`
 查找并返回`target`对象的`name`属性,如果没有该属性,则返回`undefined`.如果`name`属性部署了读取函数,则读取函数的`this`绑定`receiver`
 
@@ -2178,8 +2196,8 @@ Reflect.get(obj, "foo", wrapper);
 - `Reflect.set(target, name, value, receiver)`
 ...
 
-### Set和Map
-#### Set
+## Set和Map
+### Set
 
 ES6提供了新的数据结构`Set`.它类似于数组,但是成员的值都是唯一的,没有重复的值.`Set`本身是一个构造函数,用来生成`Set`数据结构.
 
@@ -2210,7 +2228,7 @@ console.log([...s]);    //["5", 5]
 console.log(s.size);    //2
 ```
 
-#####  Set的方法和属性
+####  Set的方法和属性
 属性
 - `size` 
 成员总数
@@ -2247,7 +2265,7 @@ function dedupe(arr){
 console.log(dedupe([1,1,2,3,4,5,5]));   //[1, 2, 3, 4, 5]
 ```
 
-##### 遍历
+#### 遍历
  - `keys()`
  - `vaules()`
  - `entries()`
@@ -2280,10 +2298,10 @@ for (let item of set.entries()) {
 
 其实还可以使用`for...of`遍历`Set`.`Set`结构的实例的`forEach`方法,用于对每个成员执行某种操作,没有返回值.
 
-#### WeakSet
+### WeakSet
 类似于`Set`略.
 
-#### Map
+### Map
 Map是比对象更灵活的一种数据结构,对象本身就就是由键值对组成的,但是属性只能是字符串,Map的键则可以用对象等更复杂方式来表示.
 
 把对象`o`当做`m`的一个键
@@ -2325,16 +2343,16 @@ console.log(m.get(['a']));  //undefined
 
 >提示: 最后一个是数组,其实是两个不同的地址,所以没办法获取值,就跟对象是一样的
 
-##### 方法和属性
+#### 方法和属性
 类似于`Set`.
 
-##### 遍历方法
+#### 遍历方法
 类似于`Set`.也可以使用`...`扩展运算符.
 
-#### WeakMap
+### WeakMap
 略.
 
-### Iterator和for...of循环
+## Iterator和for...of循环
 `ES5`中的表示集合的属性类型只有`Array`和`Object`,`ES6`中又新增了`Map`和`Set`.需要一种统一的接口机制,来处理所有不同的数据结构,遍历器（`Iterator`）就是这样一种机制.它是一种接口,为各种不同的数据结构提供统一的访问机制.任何数据结构只要部署`Iterator`接口,就可以完成遍历操作（即依次处理该数据结构的所有成员）.
 
 `Iterator`的作用有三个：一是为各种数据结构,提供一个统一的、简便的访问接口；二是使得数据结构的成员能够按某种次序排列；三是`ES6`创造了一种新的遍历命令`for...of`循环,`Iterator`接口主要供`for...of`消费.
@@ -2370,7 +2388,7 @@ console.log(it.next());     // Object { value=undefined, done=true}
 
 在`ES6`中,有些数据结构原生具备`Iterator`接口（比如数组）,即不用任何处理,就可以被`for...of`循环遍历,有些就不行（比如对象）.原因在于,这些数据结构原生部署了`Symbol.iterator`属性（详见下文）,另外一些数据结构没有.凡是部署了`Symbol.iterator`属性的数据结构,就称为部署了遍历器接口.调用这个接口,就会返回一个遍历器对象.
 
-#### 数据结构的默认Iterator接口
+### 数据结构的默认Iterator接口
 `ES6`规定,默认的`Iterator`接口部署在数据结构的`Symbol.iterator`属性,或者说,一个数据结构只要具有`Symbol.iterator`属性,就可以认为是“可遍历的”（`iterable`）.**调用`Symbol.iterator`**方法**,就会得到当前数据结构默认的遍历器生成函数.**
 
 在`ES6`中,有三类数据结构原生具备`Iterator`接口：`Array`、类数组对象、`Set`和`Map`结构.
@@ -2476,10 +2494,10 @@ while(!result.done){
 }
 ```
 
-#### 调用Iterator接口的场合
+### 调用Iterator接口的场合
 有一些场合会默认调用`Iterator`接口（即`Symbol.iterator`方法）,例如`for...of`循环
 
-##### 解构赋值
+#### 解构赋值
 
 对数组和`Set`结构进行解构赋值时,会默认调用`Symbol.iterator`方法
 
@@ -2490,7 +2508,7 @@ let [first,...rest] = set;
 console.log(rest);  //["b", "c"]
 ```
 
-##### `...`扩展运算符
+#### `...`扩展运算符
 该运算符也会调用默认的`iterator`接口
 
 ``` javascript
@@ -2503,7 +2521,7 @@ console.log([...str,...arr]);   //["h", "e", "l", "l", "o", "r", "e"]
 
 >提示: 只要某个数据接口部署了`iterator`接口,就可以对它使用扩展运算符,将其转为数组. `let arr = [...iterable];`
 
-##### `yield*`
+#### `yield*`
 
 `yield*`后面跟的是一个可遍历的结构,会调用该结构的遍历器接口
 
@@ -2524,7 +2542,7 @@ console.log(iterator.next());   //Object { value=5,  done=false}
 console.log(iterator.next());   //Object { value=undefined,  done=true}
 ```
 
-##### 其他场合
+#### 其他场合
 
 数组的遍历会调用遍历器接口,所以任何接受数组作为参数的场合,其实都调用了遍历器接口
 - `for...of`
@@ -2533,7 +2551,7 @@ console.log(iterator.next());   //Object { value=undefined,  done=true}
 - `Promise.all`
 - `Promise.race`
 
-#### 字符串的Iterator接口
+### 字符串的Iterator接口
 字符串也是一个类数组对象,也原生具有`Iterator`接口
 
 ``` javascript
@@ -2551,7 +2569,7 @@ console.log(iterator.next());   //Object { value=undefined,  done=true}
 
 >提示:调用`Symbol.iterator`方法返回一个遍历器对象,该对象具有`next`方法,从而实现遍历.
 
-#### Iterator接口与Generator函数
+### Iterator接口与Generator函数
 `Symbol.iterator`方法的最简单实现
 
 ``` javascript
@@ -2585,7 +2603,7 @@ console.log(objIter.next());    //Object { value="world",  done=false}
 console.log(objIter.next());    //Object { done=true,  value=undefined} 
 ```
 
-#### 遍历器对象的方法
+### 遍历器对象的方法
 
 - next
 - return
@@ -2594,9 +2612,9 @@ console.log(objIter.next());    //Object { done=true,  value=undefined}
 >提示: 在`Generator`中讲解.
 
 
-#### `for...of`
+### `for...of`
 
-##### Array
+#### Array
 
 `for...of`循环内部调用的是数据接口的`Symbol.iterator`方法.
 
@@ -2648,7 +2666,7 @@ for(let key in arr){    //当然是遍历所有属性名
 }
 ```
 
-##### Set和Map
+#### Set和Map
 `Set`和`Map`和`Array`一样,原生具有`Iterator`接口,可以直接使用`for...of`循环.
 
 
@@ -2672,7 +2690,7 @@ for(let [key,value] of person){
 
 >提示: Set结构遍历时,返回的是一个值,而Map结构遍历时,返回的是一个具有键值对的数组.
 
-##### 计算生成的数据结构
+#### 计算生成的数据结构
 以下三个方法调用后返回遍历器对象
 
 - entries 
@@ -2707,7 +2725,7 @@ for(let pair of arr.entries()){
 }
 ```
 
-##### 类数组对象
+#### 类数组对象
 
 `DOM NodeList`对象,`arguments`对象都是类数组对象.
 
@@ -2769,7 +2787,7 @@ for(let value of Array.from(arr1)){ //将类数组对象转化为数组
     console.log(value); //a b
 }
 ```
-##### 比较
+#### 比较
 
 `for...in`循环的缺点
 - 遍历数组的键名时以字符串'0','1'.'2'作为键名
@@ -2802,7 +2820,7 @@ for(let value of Array.from(obj)){
 }
 ```
 
-### Generator
+## Generator
 
 `Generator`函数是`ES6`提供的一种异步编程解决方案,语法行为与传统函数完全不同.`Generator`函数是一个状态机,封装了多个内部状态.执行`Generator`函数会返回一个遍历器对象,也就是说,`Generator`函数除了状态机,还是一个遍历器对象生成函数.返回的遍历器对象,可以依次遍历`Generator`函数内部的每一个状态.
 形式上,`Generator`函数是一个普通函数,但是有两个特征.一是,`function`关键字与函数名之间有一个星号；二是,函数体内部使用`yield`语句,定义不同的内部状态（`yield`语句在英语里的意思就是“产出”）.
@@ -2839,7 +2857,7 @@ function *f(){};
 function*f(){};
 ```
 
-#### yield
+### yield
 由于`Generator`函数返回的遍历器对象,只有调用`next`方法才会遍历下一个内部状态,所以其实提供了一种可以暂停执行的函数.`yield`语句就是暂停标志.
 
 - 遇到`yield`语句,就暂停执行后面的操作(比如有一个加法操作,没有遇到该`yield`之前是不会执行该语句的,等于手动的'惰性求值'),并将紧跟在`yield`后面的那个表达式的值,作为返回的对象的`value`属性值.
@@ -2876,7 +2894,7 @@ function * fGen(){
 let f = fGen(); //error 报错
 ```
 
-#### Iterator接口关系
+### Iterator接口关系
 对象的`Symbol.iterator`方法相当于一个遍历器生成函数,调用该函数会返回该对象的遍历器对象. 由于`Generator`函数就是遍历器生成函数,因此把`Generator`赋值给对象的`Symbol.iterator`属性,从而使得该对象具有`Iterator`接口.
 
 ``` javascript
@@ -2910,8 +2928,8 @@ console.log(g.next());  //Object { value=1,  done=false}
 console.log(s.next());  //Object { value=2,  done=false}
 ```
 
-#### next方法的参数
-#### for...of循环
+### next方法的参数
+### for...of循环
 一旦`next`方法的返回对象的`done`属性为`true`,`for...of`循环就会中止,且不包含该返回的对象,所以`return`语句返回的值就不会被遍历
 
 ``` javascript
@@ -3010,7 +3028,7 @@ for(let [key,value] of person){
 //two:ziyi3
 //three:ziyi4
 ```
-#####  Generator.prototype.throw
+####  Generator.prototype.throw
  `Generator`函数返回的遍历器对象,都有一个`throw`方法,可以在函数体外抛出错误,然后在`Generator`函数体内捕获.
 
 ``` javascript
@@ -3224,7 +3242,7 @@ try {
 }
 ```
 
-#####  Generator.prototype.return 
+####  Generator.prototype.return 
 
 `return`方法用来终结遍历状态,就好像在`Generator`函数中遇到了`return`
 
@@ -3271,7 +3289,7 @@ console.log(g.next());      //Object { value=5,  done=false}
 
 >提示:调用`return`后,先执行`finally`中的代码块,执行完后再执行`return`方法
 
-##### `yield*`
+#### `yield*`
 
 在`Generator`函数内部要调用`Generator`函数是不行的,此时可以用`yield*`来代替
 
@@ -3425,7 +3443,7 @@ for(let value of iterTree(tree)) {
 }
 ```
 
-##### Generator作为对象的属性
+#### Generator作为对象的属性
 
 ```javascript
 let obj = {
@@ -3464,7 +3482,7 @@ console.log(obj.say()); //hi
 >提示: 不能把`Generator`函数当做普通的构造函数,并且不能和new命令结合
 
 
-##### 状态机
+#### 状态机
 
 ```javascript
 //ES5
@@ -3503,7 +3521,7 @@ x.next();   //'Tick!'
 ```
 
 
-##### 协程
+#### 协程
 
 协程（coroutine）是一种程序运行的方式,可以理解成“协作的线程”或“协作的函数”.协程既可以用单线程实现,也可以用多线程实现.前者是一种特殊的子例程,后者是一种特殊的线程.
 
@@ -3523,7 +3541,7 @@ Generator函数是ECMAScript 6对协程的实现,但属于不完全实现.Genera
 
 如果将Generator函数当作协程,完全可以将多个需要互相协作的任务写成Generator函数,它们之间使用yield语句交换控制权.
 
-##### 应用
+#### 应用
 - 异步操作的同步化表达
 
 ```javascript
@@ -3653,8 +3671,8 @@ for (task of doStuff()) {
 
 ```
 
-### Promise
-#### Promise概述
+## Promise
+### Promise概述
 - 对象的状态不受外界影响
 `Promise`对象代表一个异步操作,有三种状态,`Pending(待决)`,`Resolved(成功)`和 `Rejected(失败)`.只有异步操作的结果,可以决定当前是哪一种状态,任何其他操作都无法改变这个状态,这也是Promise这个名字的由来,它的英语意思就是“承诺”,表示其他手段无法改变.
 
@@ -3666,7 +3684,7 @@ for (task of doStuff()) {
 `Promise`也有一些缺点.首先,无法取消`Promise`,一旦新建它就会立即执行,无法中途取消.其次,如果不设置回调函数,`Promise`内部抛出的错误,不会反应到外部.第三,当处于`Pending`状态时,无法得知目前进展到哪一个阶段（刚刚开始还是即将完成）.
 如果某些事件不断地反复发生,一般来说,使用`stream`模式是比部署`Promise`更好的选择
 
-#### 用法
+### 用法
 
 
 ```javascript
@@ -3821,7 +3839,7 @@ p2.then(value => console.log('resolve ' + value),
         error => console.log('reject ' + error));   //reject p1 reject
 ```
 
-#### Promise.prototype.then
+### Promise.prototype.then
 
 为`Promise`实例添加状态改变时对应的回调函数,第一个参数`Resolve`状态对应的回调函数,第二个参数是`Rejected`状态对应的回调函数,也可以进行链式调用,比如`ajax`请求时,连续需要发送好几个`ajax`,但是后一个`ajax`需要在前一个`ajax`请求成功时才触发,此时非常适用!
 
@@ -3846,7 +3864,7 @@ p.then((data) => {
 >提示: 通常两个异步操作如果同时执行,它们的回调函数的触发时间的先后是不一定的,要看异步操作的执行状态时间,但是采用链式的形式可以指定一组按照顺序执行的异步操作
 
 
-#### Promise.prototype.catch
+### Promise.prototype.catch
 
 如果异步操作抛出错误,状态就会变为`Rejected`,就会调用`catch`方法指定的回调函数,处理这个错误
 
@@ -3973,7 +3991,7 @@ promise.then((value) => console.log('resolve1:' + value))
 >提示: 第一个`catch`有错误后在第二个`catch`中抛出
 
 
-#### Promise.all
+### Promise.all
 
 接收一个数组作为参数或者该参数具有`Iterator`接口,每一个成员都必须是`Promise`实例.
 
@@ -4021,7 +4039,7 @@ ps.then((values) => console.log(values))
 
 ```
 
-#### Promise.race
+### Promise.race
 
 race,比赛的意思,所以和all正好相反的是,只要有一个实例率先改变状态,`ps`的状态就跟着改变了,那个率先改变的`Promise`实例的返回值,就传递给`ps`的回调函数,这种方法可以用作超时处理
 
@@ -4046,7 +4064,7 @@ ps.then((value) => console.log('resolve:' + value)) //resolve:task 1
 
 >提示:如果任务一是一个`ajax`请求,那么我们就可以设定多少时间没有处理就拒绝处理,返回超时提醒
 
-#### Promise.resolve
+### Promise.resolve
 
 将现有对象转换为`Promise`对象
 
@@ -4106,7 +4124,7 @@ console.log('global');
 >提示: 关于事件循环可以查看[JavaScript 运行机制详解：再谈Event Loop](http://www.ruanyifeng.com/blog/2014/10/event-loop.html)
 
 
-#### Promise.reject
+### Promise.reject
 
 与`resove`方法对应
 
@@ -4115,7 +4133,7 @@ let p = Promise.reject('reject!');
 p.catch((err) => console.log(err)); //reject
 ```
 
-#### done
+### done
 该方法总是处于回调链的尾端,保证任何可能的错误最终都可以捕捉到
 
 ```javascript
@@ -4134,7 +4152,7 @@ Promise.prototype.done = function (onFulfilled, onRejected) {
 };
 ```
 
-#### finally
+### finally
 
 `finally`方法用于指定不管`Promise`对象最后状态如何,都会执行的操作
 
@@ -4154,9 +4172,9 @@ Promise.prototype.finally = function (callback) {
 };
 ```
 
-#### 应用
+### 应用
 
-##### 加载图片
+#### 加载图片
 
 ```javascript
 const preloadImage = function (path) {
@@ -4169,7 +4187,7 @@ const preloadImage = function (path) {
 };
 ```
 
-##### `Generator`函数与`Promise`的结合
+#### `Generator`函数与`Promise`的结合
 
 
 ``` javascript
@@ -4335,9 +4353,9 @@ run(g);
 ```
 
 
-### 异步操作和Async
+## 异步操作和Async
 
-#### Promise
+### Promise
 
 ```javascript
 fs.readFile(fileA, function (err, data) {
@@ -4371,7 +4389,7 @@ readFile(fileA)
 缺陷:`Promise`的最大问题是代码冗余,原来的任务被`Promise`包装了一下,不管什么操作,一眼看去都是一堆`then`,原来的语义变得很不清楚.
 
 
-#### Generator
+### Generator
 
 协程
 
@@ -4388,7 +4406,7 @@ task.next().value.then(value => task.next(value));
 协程遇到`yield`命令就暂停,等到执行权返回,再从暂停的地方继续往后执行.它的最大优点,就是代码的写法非常像同步操作,如果去除`yield`命令,简直一模一样.
 
 
-##### Generator函数的数据交换和错误处理
+#### Generator函数的数据交换和错误处理
 
 `Generator`函数可以暂停执行和恢复执行,这是它能封装异步任务的根本原因.除此之外,它还有两个特性,使它可以作为异步编程的完整解决方案：函数体内外的数据交换和错误处理机制.
 `next`方法返回值的`value`属性,是`Generator`函数向外输出数据；`next`方法还可以接受参数,这是向`Generator`函数体内输入数据.
@@ -4410,7 +4428,7 @@ console.log(g.next());  //Object { value=4,  done=false}
 console.log(g.next(5)); //Object { value=5,  done=true}
 ```
 
-##### 异步任务
+#### 异步任务
 
 ``` javascript
 function* gen() {
@@ -4435,7 +4453,7 @@ result.next().value
 ```
 
 
-#### Thunk
+### Thunk
 
 传值调用(C语言就是这么干的)
 
@@ -4459,7 +4477,7 @@ let x= 2;
 f(x+5,7);   //传入f的参数先不计算,因为根本没用到,先计算就造成了性能消耗
 ```
 
-##### Thunk函数传名调用
+#### Thunk函数传名调用
 
 ``` javascript
 let x = 5;
@@ -4473,7 +4491,7 @@ function f(thunk) {
 console.log(f(thunk));  //20
 ```
 
-##### JavaScript中的Thunk
+#### JavaScript中的Thunk
 
 `JavaScript`本身是传值调用的.在`JavaScript`语言中,`Thunk`函数替换的不是表达式,而是多参数函数,将其替换成单参数的版本,且只接受回调函数作为参数.
 
@@ -4521,7 +4539,7 @@ let readFileThunk = Thunk(fs.readFile);
 readFileThunk(fileName)(callback);
 ```
 
-##### Thunkify模块
+#### Thunkify模块
 
 生产环境的转换器,使用`Thunkify`模块
 
@@ -4539,7 +4557,7 @@ let read = thunkify(fs.readFile);
 read('app.txt')(callback);
 ```
 
-##### Thunk函数的应用
+#### Thunk函数的应用
 
 首先来看看`Generator`函数的自动执行
 
@@ -4587,7 +4605,7 @@ f1.value(function(err,data){
 ```
 
 
-##### Thunk函数的自动流程管理
+#### Thunk函数的自动流程管理
 
 自动执行Generator函数
 
@@ -4621,7 +4639,7 @@ run(gen);
 >提示:使用这种方法跟在`yield`后面的必须是thunk函数,当然`Promise`也可以做到这个
 
 
-#### co
+### co
 
 该模块可以让你不用编写`Generator`函数的执行器
 
@@ -4647,7 +4665,7 @@ co(gen).then(() => {
 ```
 
 
-##### 原理
+#### 原理
 
 前面说过,`Generator`就是一个异步操作的容器.它的自动执行需要一种机制,当异步操作有了结果,能够自动交回执行权.两种方法可以做到这一点
 
@@ -4656,7 +4674,7 @@ co(gen).then(() => {
 
 `co`模块其实就是将两种自动执行器（`Thunk`函数和`Promise`对象）,包装成一个模块.使用`co`的前提条件是,`Generator`函数的`yield`命令后面,只能是`Thunk`函数或`Promise`对象
 
-##### 基于Promise对象的自动执行
+#### 基于Promise对象的自动执行
 
 ```javascript
 const fs = require('fs');
@@ -4707,7 +4725,7 @@ function run(gen) {
 run(gen);
 ```
 
-##### 处理并发的异步操作
+#### 处理并发的异步操作
 
 `co`支持并发的异步操作,即允许某些操作同时进行,等到它们全部完成,才进行下一步
 
@@ -4745,7 +4763,7 @@ function* somethingAsync(x) {
 }
 ```
 
-#### async
+### async
 
 ```javascript
 var fs = require('fs');
@@ -4799,7 +4817,7 @@ var result = asyncReadFile();
 
 
 
-### Class
+## Class
 
 ```javascript
 'use strict';
@@ -4903,7 +4921,7 @@ p1['Greeting ziyi2'](); //ziyi3
 ```
 
 
-#### class不存在变量提升
+### class不存在变量提升
 
 ```javascript
 let x = 'ziyi2';
@@ -4941,7 +4959,7 @@ let p = new Father('ziyi2',23);
 p.sayName();    //ziyi2
 ```
 
-#### class表达式
+### class表达式
 
 `Class`也可以使用表达式的形式定义
 
@@ -4986,7 +5004,7 @@ p.sayName();        //ZIYI2 : 34
 
 
 
-#### 私有方法
+### 私有方法
 
 采用`_`命令的函数当做私有函数
 ```javascript
@@ -5028,20 +5046,20 @@ export default subclassFactory({
 });
 ```
 
-#### 严格模式
+### 严格模式
 
 类和模块的内部,默认就是严格模式,所以不需要使用`use strict`指定运行模式.只要你的代码写在类或模块之中,就只有严格模式可用.
 考虑到未来所有的代码,其实都是运行在模块之中,所以ES6实际上把整个语言升级到了严格模式
 
 
-#### name 
+### name 
 
 ```javascript
 class P {}
 console.log(P.name);    //P
 ```
 
-#### class继承
+### class继承
 
 使用`extends`关键字实现继承
 
@@ -5206,7 +5224,7 @@ console.log(f instanceof Person);   //true 与ES5行为一致
 ```
 
 
-#### prototype和__proto__
+### prototype和__proto__
 
 - prototype
 子类的__proto__属性,表示构造函数的继承,总是指向父类
@@ -5222,7 +5240,7 @@ console.log(Father.prototype.__proto__=== Person.prototype);    //true
 ```
 
 
-#### Extends的继承目标
+### Extends的继承目标
 
 只要`B`有`prototype`属性,就能被`A`继承
 
@@ -5230,7 +5248,7 @@ console.log(Father.prototype.__proto__=== Person.prototype);    //true
 class A extends B {}
 ```
 
-#### Object.getPrototypeOf()
+### Object.getPrototypeOf()
 
 从子类上获取父类
 
@@ -5241,13 +5259,13 @@ let bool = Object.getPrototypeOf(A) === B;
 console.log(bool);  //true
 ```
 
-#### super
+### super
 
 - 作为函数调用时（即`super(...args)`）,`super`代表父类的构造函数
 - 作为对象调用时（即`super.prop`或`super.method()`）,`super`代表父类.注意,此时`super`即可以引用父类实例的属性和方法,也可以引用父类的静态方法
 
 
-#### 原生构造函数的继承
+### 原生构造函数的继承
 
 - Boolean
 - Number
@@ -5276,7 +5294,7 @@ arr.length = 0;
 arr[0] // undefined
 ```
 
-#### getter和setter
+### getter和setter
 
 ```javascript
 class MyClass {
@@ -5300,7 +5318,7 @@ inst.prop
 // 'getter'
 ```
 
-#### Class的Generator方法
+### Class的Generator方法
 
 `Foo`类的`Symbol.iterator`方法前有一个星号,表示该方法是一个`Generator`函数.`Symbol.iterator`方法返回一个`Foo`类的默认遍历器,`for...of`循环会自动调用这个遍历器.
 
@@ -5323,7 +5341,7 @@ for (let x of new Foo('hello', 'world')) {
 // world
 ```
 
-#### Class的静态属性和实例属性
+### Class的静态属性和实例属性
 
 静态属性指的是`Class`本身的属性,即`Class.propname`,而不是定义在实例对象（`this`）上的属性
 
@@ -5404,7 +5422,7 @@ class Foo {
 }
 ```
 
-#### new.target
+### new.target
 
 `new.target`属性返回`new`命令作用于的那个构造函数(当前类),如果构造函数不是通过new命令调用的,`new.target`会返回`undefined`
 
@@ -5462,7 +5480,7 @@ class Father extends Person {
 let p = new Person('ziyi2',23); //Error: error
 ```
 
-#### Mixin模式的实现
+### Mixin模式的实现
  
 略.
 
@@ -5471,7 +5489,7 @@ let p = new Person('ziyi2',23); //Error: error
 
 这是ES7的内容,目前Babel转换器已经支持.
 
-### Module
+## Module
 
 `CommonJS`规范,运行时加载,因为只有运行时才能得到这个对象,导致完全没办法在编译时做“静态优化”
 
@@ -5506,7 +5524,7 @@ import {state,exists,readFile} from 'fs';
 `Node`的默认模块格式是`CommonJS`,目前还没决定怎么支持`ES6`模块.所以,只能通过`Babel`这样的转码器,在`Node`里面使用`ES6`模块
 
 
-#### 严格模式
+### 严格模式
 `ES6`的模块自动采用严格模式,不管你有没有在模块头部加上`"use strict"`;
 
 - 变量必须声明后再使用
@@ -5527,7 +5545,7 @@ import {state,exists,readFile} from 'fs';
 
 上面这些限制,模块都必须遵守.
 
-#### export
+### export
 `export`命令用于规定模块的对外接口,`import`命令用于输入其他模块提供的功能,对外输出两个变量
 
 ```javascript
@@ -5605,7 +5623,7 @@ function foo() {
 
 ```
 
-#### import
+### import
 
 ```javascript
 //profile.js
@@ -5632,7 +5650,7 @@ import {firstName,lastName} from './profile';
 import 'babel-profill'
 ```
 
-#### 模块的整体加载
+### 模块的整体加载
 
 ```javascript
 //用*指定一个对象,所有的输出值都加载到这个对象上面
@@ -5653,7 +5671,7 @@ circle.circumference(3);
 ```
 
 
-#### export default
+### export default
 
 使用`import`命令的时候,用户需要知道所要加载的变量名或函数名,否则无法加载,用户肯定希望快速上手,未必愿意阅读文档,去了解模块有哪些属性和方法,为了给用户提供方便,让他们不用阅读文档就能加载模块,就要用到`export default`命令,为模块指定默认输出,加载该模块时,`import`命令可以为该匿名函数指定任意名字
 
@@ -5759,7 +5777,7 @@ import MyClass from 'MyClass';
 let o = new MyClass();
 ```
 
-#### 模块的继承
+### 模块的继承
 
 假设有一个`circleplus`模块,继承了`circle`模块
 
@@ -5785,7 +5803,7 @@ export { area as circleArea } from 'circle';
 import * as math from 'circleplus';
 ```
 
-#### ES6模块加载的实质
+### ES6模块加载的实质
 
 `ES6`模块加载的机制,与`CommonJS`模块完全不同.`CommonJS`模块输出的是一个值的拷贝,而`ES6`模块输出的是值的引用,`CommonJS`模块输出的是被输出值的拷贝,也就是说,一旦输出一个值,模块内部的变化就影响不到这个值
 
@@ -5857,11 +5875,11 @@ function C() {
 export let c = new C();
 ```
 
-#### 循环加载
+### 循环加载
 
 “循环加载”（circular dependency）指的是,`a`脚本的执行依赖`b`脚本,而`b`脚本的执行又依赖`a`脚本,通常,“循环加载”表示存在强耦合,如果处理不好,还可能导致递归加载,使得程序无法执行,因此应该避免出现
 
-##### CommonJS
+#### CommonJS
 
 ```javascript
 {
@@ -5918,7 +5936,7 @@ exports.bad = function (arg) {
 };
 ```
 
-##### ES6
+#### ES6
 
 ```javascript
 // a.js如下
@@ -5945,7 +5963,7 @@ bar
 
 `ES6`加载的变量,都是动态引用其所在的模块.只要引用存在,代码就能执行.
 
-#### 跨模块常量
+### 跨模块常量
 
 ```javascript
 //constants.js
@@ -5962,7 +5980,7 @@ import {A,B} from './constants';
 console.log(A);
 ```
 
-### 编程风格
+## 编程风格
 
 函数的参数如果是对象的成员,优先使用解构赋值
 
@@ -6331,6 +6349,7 @@ index.js
 上面代码说明,原文件有三个错误,一个是定义了变量,却没有使用,另外两个是行首缩进为4个空格,而不是规定的2个空格
 
 
-### 参考
+## 参考
 
 本文出处请查看阮一峰大师的[ECMAScript 6入门](http://es6.ruanyifeng.com/)!
+
