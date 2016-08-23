@@ -6333,4 +6333,4 @@ index.js
 
 ### 参考
 
-本文出处请查看阮一峰大师的[ECMAScript 6入门](http://es6.ruanyifeng.com/)____
+本文出处请查看阮一峰大师的[ECMAScript 6入门](http://es6.ruanyifeng.com/)!
