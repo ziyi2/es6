@@ -1,6 +1,4 @@
 ---
-title: ECMAScript 6
-date: 2016-08-04 22:31:38
 categories:
 - Stack
 - JavaScript
