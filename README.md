@@ -4410,7 +4410,7 @@ console.log(g.next());  //Object { value=4,  done=false}
 console.log(g.next(5)); //Object { value=5,  done=true}
 ```
 
- ##### 异步任务
+##### 异步任务
 
 ``` javascript
 function* gen() {
@@ -4558,14 +4558,12 @@ while(!res.done) {
 ```
 需要注意的是这种方法不适合异步操作,如果必须保证前一步执行完才可以进行后一步操作,那么Thunk函数就非常有用了
 
-
-
+``` javascript
 const fs = require('fs');
 const thunkify = require('thunkify');
 const readFile = thunkify(fs.readFile);
 //使用方法 readFile(fileName)(callback);
 
-``` javascript
 function* gen() {
     let f1 = yield readFile('1.txt');   //返回的是有一个回调函数作为参数的函数
     console.log(f1.toString());
@@ -4600,7 +4598,7 @@ const readFile = thunkify(fs.readFile);
 //使用方法 readFile(fileName)(callback);
 
 function* gen() {
-    let f1 = yield readFile('1.txt');   //返回的是Thunk函数,该函数只有一个参数就是回调函数
+    let f1 = yield readFile('1.txt');   //返回的是Promise对象
     let f2 = yield readFile('2.txt');
     let f3 = yield readFile('2.txt');
     let f4 = yield readFile('2.txt');
@@ -4733,7 +4731,7 @@ co(function* () {
 }).catch(onerror);
 ```
 
-上面的代码允许并发三个`somethingAsync`异步操作，等到它们全部完成，才会进行下一步
+上面的代码允许并发两个`somethingAsync`异步操作，等到它们全部完成，才会进行下一步
 
 ```javascript
 co(function* () {
@@ -5016,7 +5014,7 @@ const snaf = Symbol('snaf');
 
 export default subclassFactory({
 
-  // 共有方法
+  // 公有方法
   foo (baz) {
     this[bar](baz);
   }
@@ -5098,7 +5096,7 @@ let f = new Father('father',56,'doctor');
 f.sayFatherInfo();  //father : 56 : doctor
 ```
 
-子类必须在constructor方法中调用`super`方法,否则会报错,因为子类没有自己的`this`对象,而是继承父类的`this`对象,如果不调用`super`方法,子类就得不到this对象
+子类必须在constructor方法中调用`super`方法,否则会报错,因为子类没有自己的`this`对象,而是继承父类的`this`对象,如果不调用`super`方法,子类就得不到`this`对象
 
 ```javascript
 class Person {
@@ -5442,8 +5440,7 @@ class Father extends Person {
 let p = new Father('ziyi2',23);
 ```
 
-
-
+如果父类当做基类只用于被继承就非常有用了
 
 ```javascript
 class Person {
@@ -5470,5 +5467,870 @@ let p = new Person('ziyi2',23); //Error: error
 略.
 
 
+### Decorator
+
+这是ES7的内容,目前Babel转换器已经支持.
+
+### Module
+
+`CommonJS`规范,运行时加载,因为只有运行时才能得到这个对象,导致完全没办法在编译时做“静态优化”
+
+```javascript
+let {stat,readFile,exists} = require('fs');
+
+//等同于
+let _fs = require('fs');
+let state = _fs.state, 
+    exists = _fs.exists,
+    readFile = _fs.readFile;
+```
+
+`ES6`模块不是对象，而是通过`export`命令显式指定输出的代码，输入时也采用静态命令的形式
+
+```javascript
+import {state,exists,readFile} from 'fs';
+```
+
+上面代码的实质是从`fs`模块加载3个方法，其他方法不加载,需要注意的是不是在运行时先获取整个`fs`模块对象,这种加载称为“编译时加载”，即`ES6`可以在编译时就完成模块加载，效率要比`CommonJS`模块的加载方式高,当然，这也导致了没法引用`ES6`模块本身，因为它不是对象.
+
+- 不再需要UMD模块格式了，将来服务器和浏览器都会支持ES6模块格式
+- 将来浏览器的新API就能用模块格式提供，不再必要做成全局变量或者`navigator`对象的属性
+- 不再需要对象作为命名空间（比如`Math`对象），未来这些功能可以通过模块提供
+
+浏览器使用ES6模块的语法如下,在网页中插入一个模块`foo.js`，由于`type`属性设为`module`，所以浏览器知道这是一个`ES6`模块
+
+```javascript
+<script type="module" src="foo.js"></script>
+```
+
+`Node`的默认模块格式是`CommonJS`，目前还没决定怎么支持`ES6`模块。所以，只能通过`Babel`这样的转码器，在`Node`里面使用`ES6`模块
 
 
+#### 严格模式
+`ES6`的模块自动采用严格模式，不管你有没有在模块头部加上`"use strict"`;
+
+- 变量必须声明后再使用
+- 函数的参数不能有同名属性，否则报错
+- 不能使用`with`语句
+- 不能对只读属性赋值，否则报错
+- 不能使用前缀0表示八进制数，否则报错
+- 不能删除不可删除的属性，否则报错
+- 不能删除变量`delete prop`，会报错，只能删除属性`delete global[prop]`
+- `eval`不会在它的外层作用域引入变量
+- `eval`和`arguments`不能被重新赋值
+- `arguments`不会自动反映函数参数的变化
+- 不能使用`arguments.callee`
+- 不能使用`arguments.caller `
+- 禁止`this`指向全局对象
+- 不能使用`fn.caller`和`fn.arguments`获取函数调用的堆栈 
+- 增加了保留字（比如`protected`、`static`和`interface`）
+
+上面这些限制，模块都必须遵守.
+
+#### export
+`export`命令用于规定模块的对外接口，`import`命令用于输入其他模块提供的功能,对外输出两个变量
+
+```javascript
+//profile.js
+export var firstName = 'ziyi2'
+export var lastName = 'ziyi3';
+```
+更清晰的写法,与上面方法相同,但是写在尾部更直观
+
+```javascript
+//profile.js
+var firstName = 'ziyi2'
+var lastName = 'ziyi3';
+export {firstName,lastName};
+```
+
+常规写法
+
+```javascript
+//输出函数或者类
+export function f(x,y) {
+    return x*y;
+}
+
+
+//输出的变量还可以重命名,使用as关键字
+function f() {}
+function f1() {}
+
+export {
+    f as function1
+    f1 as function2
+};
+
+
+//error写法,会报错
+export 1;
+var m = 1;
+export m;
+
+
+//写成接口形式
+export var m = 1;
+
+var m = 1;
+export {m};
+
+var m1 = 1;
+export {m1 as m};
+
+
+//error写法
+function f() {}
+export f;
+
+//写成接口形式
+export function f() {};
+
+function f() {}
+export {f};
+
+
+//动态绑定关系
+export var name = 'ziyi2';
+setTimeout(() => foo = 'baz', 500);
+//500ms后的值为baz,导出的值也会变成baz,CommonJS规范因为输出的是值得缓存,所以不存在动态更新
+
+
+//error写法
+function foo() {
+    export default 'bar'    //SyntaxError
+}
+
+//export可以出现在模块的任何位置都是必须处于顶层作用域,否则会报错
+
+```
+
+#### import
+
+```javascript
+//profile.js
+var firstName = 'ziyi2'
+var lastName = 'ziyi3';
+export {firstName,lastName};
+
+//main.js
+import {firstName,lastName} from './profile';
+
+//import命令接收一个对象,里面指定其他模块导入的变量名
+//需要注意的是{}中的变量名必须与被导入模块对外接口的名称相同
+
+//重命名
+import {firstName as name} from './profile';
+
+
+//import会有提升作用
+console.log(firstName); //不会报错
+import {firstName,lastName} from './profile';
+
+
+//import语句执行所加载的模块,执行babel-profill模块,但是不输入任何值
+import 'babel-profill'
+```
+
+#### 模块的整体加载
+
+```javascript
+//用*指定一个对象,所有的输出值都加载到这个对象上面
+
+//circle.js
+export function area(radius) {
+    //some code
+}
+
+export function circumference(radius) {
+    //some code
+}
+
+//main.js
+import * as circle from './circle';
+circle.area(3);
+circle.circumference(3);
+```
+
+
+#### export default
+
+使用`import`命令的时候，用户需要知道所要加载的变量名或函数名,否则无法加载,用户肯定希望快速上手，未必愿意阅读文档，去了解模块有哪些属性和方法,为了给用户提供方便，让他们不用阅读文档就能加载模块，就要用到`export default`命令，为模块指定默认输出,加载该模块时，`import`命令可以为该匿名函数指定任意名字
+
+```javascript
+//default.js
+export default function() {
+    console.log('foo');
+}
+
+//main.js
+import defaultName from './default';
+defaultName();
+```
+
+非匿名函数也是可以的
+
+```JavaScript
+//default.js
+export default function foo() {
+    console.log('foo');
+}
+
+//或者
+function foo() {
+    console.log('foo');
+}
+
+export default foo;
+```
+
+使用`export default`时，对应的`import`语句不需要使用大括号；不使用`export default`时，对应的`import`语句需要使用大括号
+
+
+```javascript
+//默认输出和正常输出
+// 输出
+export default function crc32() {
+  // ...
+}
+// 输入
+import crc32 from 'crc32';
+
+// 输出
+export function crc32() {
+  // ...
+};
+// 输入
+import {crc32} from 'crc32';
+```
+
+本质上，`export default`就是输出一个叫做`default`的变量或方法，然后系统允许你为它取任意名字
+
+```javascript
+// modules.js
+function add(x, y) {
+  return x * y;
+}
+export {add as default};
+// 等同于
+// export default add;
+
+// app.js
+import { default as xxx } from 'modules';
+// 等同于
+// import xxx from 'modules';
+```
+
+
+正是因为`export default`命令其实只是输出一个叫做`default`的变量，所以它后面不能跟变量声明语句,`export default a`的含义是将变量`a`的值赋给变量`default`
+
+```javascript
+// 正确
+export var a = 1;
+
+// 正确
+var a = 1;
+export default a;
+
+// 错误
+export default var a = 1;
+```
+
+输入jQuery
+
+```javascript
+import $ from 'jquery';
+```
+
+如果想在一条`import`语句中，同时输入默认方法和其他变量，可以写成下面这样
+
+```javascript
+import customName, { otherMethod } from './export-default';
+```
+
+`export default`也可以用来输出类
+
+```javascript
+// MyClass.js
+export default class { ... }
+
+// main.js
+import MyClass from 'MyClass';
+let o = new MyClass();
+```
+
+#### 模块的继承
+
+假设有一个`circleplus`模块，继承了`circle`模块
+
+```javascript
+// circleplus.js
+
+export * from 'circle';
+export var e = 2.71828182846;
+export default function(x) {
+  return Math.exp(x);
+}
+```
+
+上面代码中的`export *`，表示再输出`circle`模块的所有属性和方法,注意，`export *`命令会忽略`circle`模块的`default`方法
+
+也可以改名后再输出
+
+```javascript
+// circleplus.js
+export { area as circleArea } from 'circle';
+
+// main.js
+import * as math from 'circleplus';
+```
+
+#### ES6模块加载的实质
+
+`ES6`模块加载的机制，与`CommonJS`模块完全不同。`CommonJS`模块输出的是一个值的拷贝，而`ES6`模块输出的是值的引用,`CommonJS`模块输出的是被输出值的拷贝，也就是说，一旦输出一个值，模块内部的变化就影响不到这个值
+
+
+```javascript
+// lib.js
+var counter = 3;
+function incCounter() {
+  counter++;
+}
+module.exports = {
+  counter: counter,
+  incCounter: incCounter,
+};
+
+// main.js
+var mod = require('./lib');
+
+console.log(mod.counter);  // 3
+mod.incCounter();
+console.log(mod.counter); // 3
+```
+
+`ES6`模块的运行机制与`CommonJS`不一样，它遇到模块加载命令`import`时，不会去执行模块，而是只生成一个动态的只读引用。等到真的需要用到时，再到模块里面去取值，换句话说，`ES6`的输入有点像`Unix`系统的“符号连接”，原始值变了，`import`输入的值也会跟着变。因此，`ES6`模块是动态引用，并且不会缓存值，模块里面的变量绑定其所在的模块
+
+```javascript
+// lib.js
+export let counter = 3;
+export function incCounter() {
+  counter++;
+}
+
+// main.js
+import { counter, incCounter } from './lib';
+console.log(counter); // 3
+incCounter();
+console.log(counter); // 4
+```
+
+由于`ES6`输入的模块变量，只是一个“符号连接”，所以这个变量是只读的，对它进行重新赋值会报错
+
+```javascript
+// lib.js
+export let obj = {};
+
+// main.js
+import { obj } from './lib';
+
+obj.prop = 123; // OK
+obj = {}; // TypeError
+```
+
+main.js从`lib.js`输入变量`obj`，可以对`obj`添加属性，但是重新赋值就会报错。因为变量obj指向的地址是只读的，不能重新赋值，这就好比`main.js`创造了一个名为`obj`的`const`变量.
+
+`export`通过接口，输出的是同一个值。不同的脚本加载这个接口，得到的都是同样的实例
+
+```javascript
+// mod.js
+function C() {
+  this.sum = 0;
+  this.add = function () {
+    this.sum += 1;
+  };
+  this.show = function () {
+    console.log(this.sum);
+  };
+}
+
+export let c = new C();
+```
+
+#### 循环加载
+
+“循环加载”（circular dependency）指的是，`a`脚本的执行依赖`b`脚本，而`b`脚本的执行又依赖`a`脚本,通常，“循环加载”表示存在强耦合，如果处理不好，还可能导致递归加载，使得程序无法执行，因此应该避免出现
+
+##### CommonJS
+
+```javascript
+{
+  id: '...',
+  exports: { ... },
+  loaded: true,
+  ...
+}
+```
+
+`CommonJS`的一个模块，就是一个脚本文件。`require`命令第一次加载该脚本，就会执行整个脚本，然后在内存生成一个对象,上面代码就是`Node`内部加载模块后生成的一个对象。该对象的`id`属性是模块名，`exports`属性是模块输出的各个接口，`loaded`属性是一个布尔值，表示该模块的脚本是否执行完毕。其他还有很多属性，这里都省略了,以后需要用到这个模块的时候，就会到`exports`属性上面取值。即使再次执行`require`命令，也不会再次执行该模块，而是到缓存之中取值。也就是说，`CommonJS`模块无论加载多少次，都只会在第一次加载时运行一次，以后再加载，就返回第一次运行的结果，除非手动清除系统缓存
+
+
+```javascript
+//a.js
+exports.done = false;
+var b = require('./b.js');
+console.log('在 a.js 之中，b.done = %j', b.done);
+exports.done = true;
+console.log('a.js 执行完毕');
+
+//b.js
+exports.done = false;
+var a = require('./a.js');
+console.log('在 b.js 之中，a.done = %j', a.done);
+exports.done = true;
+console.log('b.js 执行完毕');
+
+//main.js
+var a = require('./a.js');
+var b = require('./b.js');    //[main.js执行到第二行时，不会再次执行b.js,而是输出缓存的b.js的执行结果]    
+console.log('在 main.js 之中, a.done=%j, b.done=%j', a.done, b.done);
+
+//console
+在 b.js 之中，a.done = false  [在b.js之中，a.js没有执行完毕，只执行了第一行]
+b.js 执行完毕
+在 a.js 之中，b.done = true
+a.js 执行完毕
+在 main.js 之中, a.done=true, b.done=true
+```
+
+由于`CommonJS`模块遇到循环加载时，返回的是当前已经执行的部分的值，而不是代码全部执行后的值，两者可能会有差异,所以，输入变量的时候，必须非常小心
+
+```javascript
+var a = require('a'); // 安全的写法
+var foo = require('a').foo; // 危险的写法
+
+exports.good = function (arg) {
+  return a.foo('good', arg); // 使用的是 a.foo 的最新值
+};
+
+exports.bad = function (arg) {
+  return foo('bad', arg); // 使用的是一个部分加载时的值
+};
+```
+
+##### ES6
+
+```javascript
+// a.js如下
+import {bar} from './b.js';
+console.log('a.js');
+console.log(bar);
+export let foo = 'foo';
+
+// b.js
+import {foo} from './a.js';
+console.log('b.js');
+console.log(foo);
+export let bar = 'bar';
+
+//console
+$ babel-node a.js
+b.js
+undefined
+a.js
+bar
+```
+
+`a.js`的第一行是加载`b.js`，所以先执行的是`b.js`。而`b.js`的第一行又是加载`a.js`，这时由于`a.js`已经开始执行了，所以不会重复执行，而是继续往下执行`b.js`，所以第一行输出的是`b.js`,接着，`b.js`要打印变量`foo`，这时`a.js`还没执行完，取不到`foo`的值，导致打印出来是`undefined`。`b.js`执行完，开始执行`a.js`，这时就一切正常了
+
+`ES6`加载的变量,都是动态引用其所在的模块.只要引用存在,代码就能执行.
+
+#### 跨模块常量
+
+```javascript
+//constants.js
+export const A = 1;
+export const B = 2;
+export const C = 3;
+
+//test.js
+import * as constants from './constants';
+console.log(constants.A);
+
+//test1.js
+import {A,B} from './constants';
+console.log(A);
+```
+
+### 编程风格
+
+函数的参数如果是对象的成员，优先使用解构赋值
+
+```JavaScript
+// bad
+function getFullName(user) {
+  const firstName = user.firstName;
+  const lastName = user.lastName;
+}
+
+// good
+function getFullName(obj) {
+  const { firstName, lastName } = obj;
+}
+
+// best
+function getFullName({ firstName, lastName }) {
+}
+```
+
+如果函数返回多个值，优先使用对象的解构赋值，而不是数组的解构赋值。这样便于以后添加返回值，以及更改返回值的顺序
+
+```javascript
+// bad
+function processInput(input) {
+  return [left, right, top, bottom];
+}
+
+// good
+function processInput(input) {
+  return { left, right, top, bottom };
+}
+
+const { left, right } = processInput(input);
+```
+
+单行定义的对象，最后一个成员不以逗号结尾。多行定义的对象，最后一个成员以逗号结尾
+
+```javascript
+// bad
+const a = { k1: v1, k2: v2, };
+const b = {
+  k1: v1,
+  k2: v2   
+};
+
+// good
+const a = { k1: v1, k2: v2 //no , };   
+const b = {
+  k1: v1,
+  k2: v2,  //,
+};
+```
+
+
+对象尽量静态化，一旦定义，就不得随意添加新的属性。如果添加属性不可避免，要使用`Object.assign`方法
+
+```JavaScript
+// bad
+const a = {};
+a.x = 3;
+
+// if reshape unavoidable
+const a = {};
+Object.assign(a, { x: 3 });
+
+// good
+const a = { x: null };
+a.x = 3;
+```
+
+
+```javascript
+var ref = 'some value';
+
+// bad
+const atom = {
+  ref: ref,
+
+  value: 1,
+
+  addValue: function (value) {
+    return atom.value + value;
+  },
+};
+
+// good
+const atom = {
+  ref,
+
+  value: 1,
+
+  addValue(value) {
+    return atom.value + value;
+  },
+};
+```
+
+使用扩展运算符（`...`）拷贝数组
+
+```javascript
+// bad
+const len = items.length;
+const itemsCopy = [];
+let i;
+
+for (i = 0; i < len; i++) {
+  itemsCopy[i] = items[i];
+}
+
+// good
+const itemsCopy = [...items];
+```
+
+使用`Array.from`方法，将类似数组的对象转为数组
+
+```javascript
+const foo = document.querySelectorAll('.foo');
+const nodes = Array.from(foo);
+```
+
+箭头函数 
+
+```javascript
+
+//best
+(() => {
+  console.log('Welcome to the Internet.');
+})();
+
+// bad
+[1, 2, 3].map(function (x) {
+  return x * x;
+});
+
+// good
+[1, 2, 3].map((x) => {
+  return x * x;
+});
+
+// best
+[1, 2, 3].map(x => x * x);
+```
+
+
+箭头函数取代`Function.prototype.bind`，不应再用`self/_this/that`绑定 `this`
+
+```javascript
+// bad
+const self = this;
+const boundMethod = function(...params) {
+  return method.apply(self, params);
+}
+
+// acceptable
+const boundMethod = method.bind(this);
+
+// best
+const boundMethod = (...params) => method.apply(this, params);
+```
+
+>提示: 简单的、单行的、不会复用的函数，建议采用箭头函数。如果函数体较为复杂，行数较多，还是应该采用传统的函数写法
+
+所有配置项都应该集中在一个对象，放在最后一个参数，布尔值不可以直接作为参数
+
+```javascript
+// bad
+function divide(a, b, option = false ) {
+}
+
+// good
+function divide(a, b, { option = false } = {}) {
+}
+```
+
+不要在函数体内使用`arguments`变量，使用rest运算符（`...`）代替。因为`rest`运算符显式表明你想要获取参数，而且`arguments`是一个类似数组的对象，而`rest`运算符可以提供一个真正的数组
+
+```javascript
+// bad
+function concatenateAll() {
+  const args = Array.prototype.slice.call(arguments);
+  return args.join('');
+}
+
+// good
+function concatenateAll(...args) {
+  return args.join('');
+}
+```
+
+
+使用默认值语法设置函数参数的默认值
+
+```javascript
+// bad
+function handleThings(opts) {
+  opts = opts || {};
+}
+
+// good
+function handleThings(opts = {}) {
+  // ...
+}
+```
+
+注意区分`Object`和`Map`，只有模拟现实世界的实体对象时，才使用`Object`。如果只是需要`key: value`的数据结构，使用`Map`结构。因为`Map`有内建的遍历机制
+
+```javascript
+let map = new Map(arr);
+
+for (let key of map.keys()) {
+  console.log(key);
+}
+
+for (let value of map.values()) {
+  console.log(value);
+}
+
+for (let item of map.entries()) {
+  console.log(item[0], item[1]);
+}
+```
+Class
+
+```javascript
+// bad
+function Queue(contents = []) {
+  this._queue = [...contents];
+}
+Queue.prototype.pop = function() {
+  const value = this._queue[0];
+  this._queue.splice(0, 1);
+  return value;
+}
+
+// good
+class Queue {
+  constructor(contents = []) {
+    this._queue = [...contents];
+  }
+  pop() {
+    const value = this._queue[0];
+    this._queue.splice(0, 1);
+    return value;
+  }
+}
+
+// bad
+const inherits = require('inherits');
+function PeekableQueue(contents) {
+  Queue.apply(this, contents);
+}
+inherits(PeekableQueue, Queue);
+PeekableQueue.prototype.peek = function() {
+  return this._queue[0];
+}
+
+// good
+class PeekableQueue extends Queue {
+  peek() {
+    return this._queue[0];
+  }
+}
+
+```
+
+
+使用`import`取代`require`
+
+```javascript
+// bad
+const moduleA = require('moduleA');
+const func1 = moduleA.func1;
+const func2 = moduleA.func2;
+
+// good
+import { func1, func2 } from 'moduleA';
+```
+
+使用`export`取代`module.exports`
+
+```javascript
+// commonJS的写法
+var React = require('react');
+
+var Breadcrumbs = React.createClass({
+  render() {
+    return <nav />;
+  }
+});
+
+module.exports = Breadcrumbs;
+
+// ES6的写法
+import React from 'react';
+
+const Breadcrumbs = React.createClass({
+  render() {
+    return <nav />;
+  }
+});
+
+export default Breadcrumbs
+```
+
+如果模块只有一个输出值，就使用`export default`，如果模块有多个输出值，就不使用`export default`，不要`export default`与普通的`export`同时使用
+
+
+如果模块默认输出一个函数，函数名的首字母应该小写
+
+```javascript
+function makeStyleGuide() {
+}
+
+export default makeStyleGuide;
+
+const StyleGuide = {
+  es6: {
+  }
+};
+
+export default StyleGuide;
+```
+
+
+`ESLint`是一个语法规则和代码风格的检查工具，可以用来保证写出语法正确、风格统一的代码。首先，安装`ESLint`
+
+```javascript
+$ npm i -g eslint
+```
+
+然后，安装`Airbnb`语法规则
+
+```javascript
+$ npm i -g eslint-config-airbnb
+```
+
+最后，在项目的根目录下新建一个`.eslintrc`文件，配置`ESLint`
+```javascript
+{
+  "extends": "eslint-config-airbnb"
+}
+```
+
+检查`index.js`
+```javascript
+var unusued = 'I have no purpose!';
+
+function greet() {
+    var message = 'Hello, World!';
+    alert(message);
+}
+
+greet();
+```
+
+```JavaScript
+$ eslint index.js
+index.js
+  1:5  error  unusued is defined but never used                 no-unused-vars
+  4:5  error  Expected indentation of 2 characters but found 4  indent
+  5:5  error  Expected indentation of 2 characters but found 4  indent
+
+✖ 3 problems (3 errors, 0 warnings)
+```
+上面代码说明，原文件有三个错误，一个是定义了变量，却没有使用，另外两个是行首缩进为4个空格，而不是规定的2个空格
+
+
+### 参考
+
+本文出处请查看阮一峰大师的[ECMAScript 6入门](http://es6.ruanyifeng.com/)____
