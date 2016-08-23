@@ -1,19 +1,3 @@
----
-categories:
-- Stack
-- JavaScript
-tags:
-- ECMAScript 6
-- Webpack
-- NodeJs
-- ECMAScript 7
-- Babel
----
-
-Hello ES6!本文主要介绍了一些基础的ES6语法知识,具体可以详见阮一峰大师的[ECMAScript 6入门](http://es6.ruanyifeng.com/)!
-<!-- more -->
-
-
 # ECMAScript 6
 
 ## 使用环境
