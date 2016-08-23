@@ -1098,7 +1098,7 @@ for(let [key,value] of arr.entries()){
 console.log([1,2,3].includes(3));   // true
 ```
 
-没有该方法之前,通常使用`indexOf`方法检测是否包含某个值,`indexOf`方法有两个缺点，一是不够语义化，它的含义是找到参数值的第一个出现位置，所以要去比较是否不等于-1，表达起来不够直观。二是，它内部使用严格相等于运算符`（===）`进行判断，这会导致对`NaN`的误判。
+没有该方法之前,通常使用`indexOf`方法检测是否包含某个值,`indexOf`方法有两个缺点,一是不够语义化,它的含义是找到参数值的第一个出现位置,所以要去比较是否不等于-1,表达起来不够直观.二是,它内部使用严格相等于运算符`（===）`进行判断,这会导致对`NaN`的误判.
 
 ``` javascript
 console.log([NaN].indexOf(NaN));    //-1
@@ -1128,7 +1128,7 @@ console.log(arr.join('-'));                         //1--2--3
 console.log(arr.toString());                        //1,,2,,3
 ```
 
-`ES6`明确将空位转为`undefined`,`Array.from`方法会将数组的空位，转为`undefined`
+`ES6`明确将空位转为`undefined`,`Array.from`方法会将数组的空位,转为`undefined`
 
 ``` javascript
 console.log(Array.from([1,,2,,3])); //[1, undefined, 2, undefined, 3]
@@ -1813,27 +1813,27 @@ let merge = (...args) => Object.assign({},...args);
 -  `Object.keys()`：返回对象自身的所有可枚举的属性的键名
 -  `JSON.stringify()`：只串行化对象自身的可枚举的属性
 
-`Object.assign()`会忽略不可枚举属性.操作中引入继承的属性会让问题复杂化，大多数时候，我们只关心对象自身的属性。所以，尽量不要用`for...in`循环，而用`Object.keys()`代替.
+`Object.assign()`会忽略不可枚举属性.操作中引入继承的属性会让问题复杂化,大多数时候,我们只关心对象自身的属性.所以,尽量不要用`for...in`循环,而用`Object.keys()`代替.
 
 ### 属性的遍历
 - `for...in`
 只遍历对象自身的和继承的可枚举的属性（不含`Symbol`属性）.
 - `Object.keys()`
 包括对象自身的（不含继承的）所有可枚举属性（不含`Symbol`属性）. `Object.getOwnPropertyNames`
-包含对象自身的所有属性（不含`Symbol`属性，但是包括不可枚举属性).
+包含对象自身的所有属性（不含`Symbol`属性,但是包括不可枚举属性).
 `Object.getOwnPropertySymbols(obj)`
 包含对象自身的所有`Symbol`属性.
 - `Reflect.ownKeys(obj)`
 返回所有的属性,不管属性名是`Symbol`还是字符串,不管是否可枚举.
 
 遍历的次序规则
- - 首先遍历所有属性名为数值的属性，按照数字排序
- - 其次遍历所有属性名为字符串的属性，按照生成时间排序
- - 最后遍历所有属性名为Symbol值的属性，按照生成时间排序
+ - 首先遍历所有属性名为数值的属性,按照数字排序
+ - 其次遍历所有属性名为字符串的属性,按照生成时间排序
+ - 最后遍历所有属性名为Symbol值的属性,按照生成时间排序
 
 ### `__proto__`,Object.setPrototypeOf,Object.getPrototypeOf
 #### `__proto__`
-`__proto__`属性（前后各两个下划线），用来读取或设置当前对象的prototype对象。目前，所有浏览器（包括IE11）都部署了这个属性.
+`__proto__`属性（前后各两个下划线）,用来读取或设置当前对象的prototype对象.目前,所有浏览器（包括IE11）都部署了这个属性.
 
 #### Object.setPrototypeOf
 用来设置一个对象的`prototype`对象.它是`ES6`正式推荐的设置原型对象的方法.格式如下
@@ -1967,7 +1967,7 @@ let s2 = Symbol.for('foo');
 console.log(s1 === s2); //true
 ```
 
-`Symbol.for()`与`Symbol()`这两种写法，都会生成新的`Symbol`。它们的区别是，前者会被登记在全局环境中供搜索，后者不会。`Symbol.keyFor`用于返回登记的值
+`Symbol.for()`与`Symbol()`这两种写法,都会生成新的`Symbol`.它们的区别是,前者会被登记在全局环境中供搜索,后者不会.`Symbol.keyFor`用于返回登记的值
 
 ``` javascript
 let s = Symbol('foo');
@@ -2031,10 +2031,10 @@ console.log(proxy.name);    //11
 console.log(proxy.age);     //11
 ```
 
->提示: `hanlder`对象里的拦截函数都有两个参数,一个是目标对象`target`,一个是所要访问的属性`property`. 以上的拦截函数`get`总是返回11,所要访问任何属性都得到11.要使得`Proxy`起作用，必须针对`Proxy`实例（上例是`proxy`对象）进行操作，而不是针对目标对象（上例是空对象）进行操作.
+>提示: `hanlder`对象里的拦截函数都有两个参数,一个是目标对象`target`,一个是所要访问的属性`property`. 以上的拦截函数`get`总是返回11,所要访问任何属性都得到11.要使得`Proxy`起作用,必须针对`Proxy`实例（上例是`proxy`对象）进行操作,而不是针对目标对象（上例是空对象）进行操作.
 
 
-如果`handler`没有设置任何拦截，那就等同于直接通向原对象.
+如果`handler`没有设置任何拦截,那就等同于直接通向原对象.
 
 ``` javascript
 let person = {
@@ -2076,7 +2076,7 @@ console.log(obj.name);  //35
 ...
 
 - `construct(target,args)`
-拦截`Proxy`实例作为构造函数调用的操作，比如`new proxy(...args)`.
+拦截`Proxy`实例作为构造函数调用的操作,比如`new proxy(...args)`.
 
 
 ``` javascript
@@ -2112,14 +2112,14 @@ var p = new Proxy(function(){},{
 console.log(new p(2).value);    //20
 ```
 
->提示:`construct`方法返回的必须是一个对象，否则会报错
+>提示:`construct`方法返回的必须是一个对象,否则会报错
 
 #### Reflect
-将`Object`对象的一些明显属于语言内部的方法（比如`Object.defineProperty`），放到`Reflect`对象上.未来的新方法将只部署在Reflect对象上.
+将`Object`对象的一些明显属于语言内部的方法（比如`Object.defineProperty`）,放到`Reflect`对象上.未来的新方法将只部署在Reflect对象上.
 
-修改某些`Object`方法的返回结果，让其变得更合理。比如，`Object.defineProperty(obj, name, desc)`在无法定义属性时，会抛出一个错误，而`Reflect.defineProperty(obj, name, desc)`则会返回`false`
+修改某些`Object`方法的返回结果,让其变得更合理.比如,`Object.defineProperty(obj, name, desc)`在无法定义属性时,会抛出一个错误,而`Reflect.defineProperty(obj, name, desc)`则会返回`false`
 
- 让`Object`操作都变成函数行为。某些`Object`操作是命令式，比如`name in obj`和`delete obj[name]`，而`Reflect.has(obj, name)`和`Reflect.deleteProperty(obj, name)`让它们变成了函数行为.
+ 让`Object`操作都变成函数行为.某些`Object`操作是命令式,比如`name in obj`和`delete obj[name]`,而`Reflect.has(obj, name)`和`Reflect.deleteProperty(obj, name)`让它们变成了函数行为.
 
 ``` javascript
 let obj = {
@@ -2144,7 +2144,7 @@ Reflect.set(obj,'age',23);
 console.log(obj.age);                   //23
 ```
 
-`Reflect`对象的方法与`Proxy`对象的方法一一对应，只要是`Proxy`对象的方法，就能在`Reflect`对象上找到对应的方法。这就让`Proxy`对象可以方便地调用对应的`Reflect`方法，完成默认行为，作为修改行为的基础。也就是说，不管`Proxy`怎么修改默认行为，你总可以在`Reflect`上获取默认行为
+`Reflect`对象的方法与`Proxy`对象的方法一一对应,只要是`Proxy`对象的方法,就能在`Reflect`对象上找到对应的方法.这就让`Proxy`对象可以方便地调用对应的`Reflect`方法,完成默认行为,作为修改行为的基础.也就是说,不管`Proxy`怎么修改默认行为,你总可以在`Reflect`上获取默认行为
 
 ``` javascript
 Proxy(target, {
@@ -2158,11 +2158,11 @@ Proxy(target, {
 });
 ```
 
-上面代码中，`Proxy`方法拦截`target`对象的属性赋值行为。它采用`Reflect.set`方法将值赋值给对象的属性，然后再部署额外的功能
+上面代码中,`Proxy`方法拦截`target`对象的属性赋值行为.它采用`Reflect.set`方法将值赋值给对象的属性,然后再部署额外的功能
 
 #### Reflect对象的方法
 - `Reflect.get(target, name, receiver)`
-查找并返回`target`对象的`name`属性，如果没有该属性，则返回`undefined`.如果`name`属性部署了读取函数，则读取函数的`this`绑定`receiver`
+查找并返回`target`对象的`name`属性,如果没有该属性,则返回`undefined`.如果`name`属性部署了读取函数,则读取函数的`this`绑定`receiver`
 
 ``` javascript
 var obj = {
@@ -2181,7 +2181,7 @@ Reflect.get(obj, "foo", wrapper);
 ### Set和Map
 #### Set
 
-ES6提供了新的数据结构`Set`.它类似于数组，但是成员的值都是唯一的，没有重复的值.`Set`本身是一个构造函数，用来生成`Set`数据结构.
+ES6提供了新的数据结构`Set`.它类似于数组,但是成员的值都是唯一的,没有重复的值.`Set`本身是一个构造函数,用来生成`Set`数据结构.
 
 ``` javascript
 let s = new Set();
@@ -2278,7 +2278,7 @@ for (let item of set.entries()) {
 // ["blue", "blue"]
 ```
 
-其实还可以使用`for...of`遍历`Set`.`Set`结构的实例的`forEach`方法，用于对每个成员执行某种操作，没有返回值.
+其实还可以使用`for...of`遍历`Set`.`Set`结构的实例的`forEach`方法,用于对每个成员执行某种操作,没有返回值.
 
 #### WeakSet
 类似于`Set`略.
@@ -2335,18 +2335,18 @@ console.log(m.get(['a']));  //undefined
 略.
 
 ### Iterator和for...of循环
-`ES5`中的表示集合的属性类型只有`Array`和`Object`,`ES6`中又新增了`Map`和`Set`.需要一种统一的接口机制，来处理所有不同的数据结构,遍历器（`Iterator`）就是这样一种机制.它是一种接口，为各种不同的数据结构提供统一的访问机制.任何数据结构只要部署`Iterator`接口，就可以完成遍历操作（即依次处理该数据结构的所有成员）.
+`ES5`中的表示集合的属性类型只有`Array`和`Object`,`ES6`中又新增了`Map`和`Set`.需要一种统一的接口机制,来处理所有不同的数据结构,遍历器（`Iterator`）就是这样一种机制.它是一种接口,为各种不同的数据结构提供统一的访问机制.任何数据结构只要部署`Iterator`接口,就可以完成遍历操作（即依次处理该数据结构的所有成员）.
 
-`Iterator`的作用有三个：一是为各种数据结构，提供一个统一的、简便的访问接口；二是使得数据结构的成员能够按某种次序排列；三是`ES6`创造了一种新的遍历命令`for...of`循环，`Iterator`接口主要供`for...of`消费.
+`Iterator`的作用有三个：一是为各种数据结构,提供一个统一的、简便的访问接口；二是使得数据结构的成员能够按某种次序排列；三是`ES6`创造了一种新的遍历命令`for...of`循环,`Iterator`接口主要供`for...of`消费.
 
 `Iterator`的遍历过程:
 
-（1）创建一个指针对象，指向当前数据结构的起始位置.也就是说，遍历器对象本质上，就是一个指针对象.
-（2）第一次调用指针对象的`next`方法，可以将指针指向数据结构的第一个成员.
-（3）第二次调用指针对象的`next`方法，指针就指向数据结构的第二个成员.
-（4）不断调用指针对象的`next`方法，直到它指向数据结构的结束位置.
+（1）创建一个指针对象,指向当前数据结构的起始位置.也就是说,遍历器对象本质上,就是一个指针对象.
+（2）第一次调用指针对象的`next`方法,可以将指针指向数据结构的第一个成员.
+（3）第二次调用指针对象的`next`方法,指针就指向数据结构的第二个成员.
+（4）不断调用指针对象的`next`方法,直到它指向数据结构的结束位置.
 
-每一次调用`next`方法，都会返回数据结构的当前成员的信息.具体来说，就是返回一个包含`value`和`done`两个属性的对象.其中，`value`属性是当前成员的值，`done`属性是一个布尔值，表示遍历是否结束.
+每一次调用`next`方法,都会返回数据结构的当前成员的信息.具体来说,就是返回一个包含`value`和`done`两个属性的对象.其中,`value`属性是当前成员的值,`done`属性是一个布尔值,表示遍历是否结束.
 
 ``` javascript
 function createIterator(array){
@@ -2368,12 +2368,12 @@ console.log(it.next());     // Object { value=undefined, done=true}
 
 上面的函数的作用就是返回一个遍历器对象,对数组执行这个函数,就会返回该数组的遍历器对象(指针对象)`it`.
 
-在`ES6`中，有些数据结构原生具备`Iterator`接口（比如数组），即不用任何处理，就可以被`for...of`循环遍历，有些就不行（比如对象）.原因在于，这些数据结构原生部署了`Symbol.iterator`属性（详见下文），另外一些数据结构没有.凡是部署了`Symbol.iterator`属性的数据结构，就称为部署了遍历器接口.调用这个接口，就会返回一个遍历器对象.
+在`ES6`中,有些数据结构原生具备`Iterator`接口（比如数组）,即不用任何处理,就可以被`for...of`循环遍历,有些就不行（比如对象）.原因在于,这些数据结构原生部署了`Symbol.iterator`属性（详见下文）,另外一些数据结构没有.凡是部署了`Symbol.iterator`属性的数据结构,就称为部署了遍历器接口.调用这个接口,就会返回一个遍历器对象.
 
 #### 数据结构的默认Iterator接口
-`ES6`规定，默认的`Iterator`接口部署在数据结构的`Symbol.iterator`属性，或者说，一个数据结构只要具有`Symbol.iterator`属性，就可以认为是“可遍历的”（`iterable`）。**调用`Symbol.iterator`**方法**，就会得到当前数据结构默认的遍历器生成函数。**
+`ES6`规定,默认的`Iterator`接口部署在数据结构的`Symbol.iterator`属性,或者说,一个数据结构只要具有`Symbol.iterator`属性,就可以认为是“可遍历的”（`iterable`）.**调用`Symbol.iterator`**方法**,就会得到当前数据结构默认的遍历器生成函数.**
 
-在`ES6`中，有三类数据结构原生具备`Iterator`接口：`Array`、类数组对象、`Set`和`Map`结构。
+在`ES6`中,有三类数据结构原生具备`Iterator`接口：`Array`、类数组对象、`Set`和`Map`结构.
 
 
 ``` javascript
@@ -2385,11 +2385,11 @@ console.log(iter.next()); // { value: 'b', done: false }
 console.log(iter.next()); // { value: 'c', done: false }
 console.log(iter.next()); // { value: undefined, done: true }
 ```
-上面代码中，变量`arr`是一个数组，原生就具有遍历器接口，部署在`arr`的`Symbol.iterator`属性上面。所以，调用这个属性，就得到遍历器对象。
+上面代码中,变量`arr`是一个数组,原生就具有遍历器接口,部署在`arr`的`Symbol.iterator`属性上面.所以,调用这个属性,就得到遍历器对象.
 
-上面提到，原生就部署`Iterator`接口的数据结构有三类，对于这三类数据结构，不用自己写遍历器生成函数，`for...of`循环会自动遍历它们。除此之外，其他数据结构（主要是对象）的`Iterator`接口，都需要自己在`Symbol.iterator`属性上面部署，这样才会被`for...of`循环遍历。
+上面提到,原生就部署`Iterator`接口的数据结构有三类,对于这三类数据结构,不用自己写遍历器生成函数,`for...of`循环会自动遍历它们.除此之外,其他数据结构（主要是对象）的`Iterator`接口,都需要自己在`Symbol.iterator`属性上面部署,这样才会被`for...of`循环遍历.
 
-对象（`Object`）之所以没有默认部署`Iterator`接口，是因为对象的哪个属性先遍历，哪个属性后遍历是不确定的，需要开发者手动指定。
+对象（`Object`）之所以没有默认部署`Iterator`接口,是因为对象的哪个属性先遍历,哪个属性后遍历是不确定的,需要开发者手动指定.
 
 
 类似数组的对象调用数组的`Symbol.iterator`方法
@@ -2436,7 +2436,7 @@ console.log(iter.next());   //Object { value=undefined,  done=false}
 console.log(iter.next());   //Object { done=true,  value=undefined}
 ```
 
-如果`Symbol.iterator`方法对应的不是遍历器生成函数（即会返回一个遍历器对象），解释引擎将会报错
+如果`Symbol.iterator`方法对应的不是遍历器生成函数（即会返回一个遍历器对象）,解释引擎将会报错
 
 ``` javascript
 var obj = {};
@@ -2804,8 +2804,8 @@ for(let value of Array.from(obj)){
 
 ### Generator
 
-`Generator`函数是`ES6`提供的一种异步编程解决方案，语法行为与传统函数完全不同。`Generator`函数是一个状态机，封装了多个内部状态。执行`Generator`函数会返回一个遍历器对象，也就是说，`Generator`函数除了状态机，还是一个遍历器对象生成函数。返回的遍历器对象，可以依次遍历`Generator`函数内部的每一个状态。
-形式上，`Generator`函数是一个普通函数，但是有两个特征。一是，`function`关键字与函数名之间有一个星号；二是，函数体内部使用`yield`语句，定义不同的内部状态（`yield`语句在英语里的意思就是“产出”）。
+`Generator`函数是`ES6`提供的一种异步编程解决方案,语法行为与传统函数完全不同.`Generator`函数是一个状态机,封装了多个内部状态.执行`Generator`函数会返回一个遍历器对象,也就是说,`Generator`函数除了状态机,还是一个遍历器对象生成函数.返回的遍历器对象,可以依次遍历`Generator`函数内部的每一个状态.
+形式上,`Generator`函数是一个普通函数,但是有两个特征.一是,`function`关键字与函数名之间有一个星号；二是,函数体内部使用`yield`语句,定义不同的内部状态（`yield`语句在英语里的意思就是“产出”）.
 
 
 ``` JavaScript
@@ -2822,15 +2822,15 @@ console.log(p.next());  //Object { value="xx3",  done=false}
 console.log(p.next());  //Object { value="ending",  done=true}
 console.log(p.next());  //Object { value=undefined,  done=true}
 ```
-调用`Generator`函数后，该函数并不执行，返回的也不是函数运行结果，而是一个指向内部状态的指针对象，也就是上一节介绍的遍历器对象`Iterator Object`.必须调用遍历器对象的`next`方法，使得指针移向下一个状态,每次调用`next`方法，内部指针就从函数头部或上一次停下来的地方开始执行，直到遇到下一个`yield`语句（或`return`语句）为止。换言之，`Generator`函数是分段执行的，`yield`语句是暂停执行的标记，而`next`方法可以恢复执行。
+调用`Generator`函数后,该函数并不执行,返回的也不是函数运行结果,而是一个指向内部状态的指针对象,也就是上一节介绍的遍历器对象`Iterator Object`.必须调用遍历器对象的`next`方法,使得指针移向下一个状态,每次调用`next`方法,内部指针就从函数头部或上一次停下来的地方开始执行,直到遇到下一个`yield`语句（或`return`语句）为止.换言之,`Generator`函数是分段执行的,`yield`语句是暂停执行的标记,而`next`方法可以恢复执行.
 
-第一次调用，`Generator`函数开始执行，直到遇到第一个`yield`语句为止。`next`方法返回一个对象，它的`value`属性就是当前`yield`语句的值`ziyi2`，`done`属性的值`false`，表示遍历还没有结束。
+第一次调用,`Generator`函数开始执行,直到遇到第一个`yield`语句为止.`next`方法返回一个对象,它的`value`属性就是当前`yield`语句的值`ziyi2`,`done`属性的值`false`,表示遍历还没有结束.
 
-第二次调用，`Generator`函数从上次`yield`语句停下的地方，一直执行到下一个`yield`语句。`next`方法返回的对象的`value`属性就是当前`yield`语句的值`xx3`，`done`属性的值`false`，表示遍历还没有结束。
+第二次调用,`Generator`函数从上次`yield`语句停下的地方,一直执行到下一个`yield`语句.`next`方法返回的对象的`value`属性就是当前`yield`语句的值`xx3`,`done`属性的值`false`,表示遍历还没有结束.
 
-一直执行到`return`语句（如果没有`return`语句，就执行到函数结束）。`next`方法返回的对象的`value`属性，就是紧跟在`return`语句后面的表达式的值（如果没有`return`语句，则`value`属性的值为`undefined`），`done`属性的值`true`，表示遍历已经结束。
+一直执行到`return`语句（如果没有`return`语句,就执行到函数结束）.`next`方法返回的对象的`value`属性,就是紧跟在`return`语句后面的表达式的值（如果没有`return`语句,则`value`属性的值为`undefined`）,`done`属性的值`true`,表示遍历已经结束.
 
-`ES6`没有规定，`function`关键字与函数名之间的星号，写在哪个位置。下面写法都是可以的,一般采用第二种
+`ES6`没有规定,`function`关键字与函数名之间的星号,写在哪个位置.下面写法都是可以的,一般采用第二种
 
 ``` JavaScript
 function * f(){};
@@ -2840,16 +2840,16 @@ function*f(){};
 ```
 
 #### yield
-由于`Generator`函数返回的遍历器对象，只有调用`next`方法才会遍历下一个内部状态，所以其实提供了一种可以暂停执行的函数。`yield`语句就是暂停标志。
+由于`Generator`函数返回的遍历器对象,只有调用`next`方法才会遍历下一个内部状态,所以其实提供了一种可以暂停执行的函数.`yield`语句就是暂停标志.
 
-- 遇到`yield`语句，就暂停执行后面的操作(比如有一个加法操作,没有遇到该`yield`之前是不会执行该语句的,等于手动的'惰性求值')，并将紧跟在`yield`后面的那个表达式的值，作为返回的对象的`value`属性值。
-- 下一次调用`next`方法时，再继续往下执行，直到遇到下一个`yield`语句。
-- 如果没有再遇到新的`yield`语句，就一直运行到函数结束，直到`return`语句为止，并将`return`语句后面的表达式的值，作为返回的对象的`value`属性值。
-- 如果该函数没有`return`语句，则返回的对象的`value`属性值为`undefined`。
+- 遇到`yield`语句,就暂停执行后面的操作(比如有一个加法操作,没有遇到该`yield`之前是不会执行该语句的,等于手动的'惰性求值'),并将紧跟在`yield`后面的那个表达式的值,作为返回的对象的`value`属性值.
+- 下一次调用`next`方法时,再继续往下执行,直到遇到下一个`yield`语句.
+- 如果没有再遇到新的`yield`语句,就一直运行到函数结束,直到`return`语句为止,并将`return`语句后面的表达式的值,作为返回的对象的`value`属性值.
+- 如果该函数没有`return`语句,则返回的对象的`value`属性值为`undefined`.
 
-`yield`语句与`return`语句既有相似之处，也有区别。相似之处在于，都能返回紧跟在语句后面的那个表达式的值。区别在于每次遇到`yield`，函数暂停执行，下一次再从该位置继续向后执行，而`return`语句不具备位置记忆的功能。一个函数里面，只能执行一次（或者说一个）`return`语句，但是可以执行多次（或者说多个）`yield`语句。正常函数只能返回一个值，因为只能执行一次`return`；`Generator`函数可以返回一系列的值，因为可以有任意多个`yield`。从另一个角度看，也可以说`Generator`生成了一系列的值，这也就是它的名称的来历（在英语中，`generator`这个词是“生成器”的意思）。
+`yield`语句与`return`语句既有相似之处,也有区别.相似之处在于,都能返回紧跟在语句后面的那个表达式的值.区别在于每次遇到`yield`,函数暂停执行,下一次再从该位置继续向后执行,而`return`语句不具备位置记忆的功能.一个函数里面,只能执行一次（或者说一个）`return`语句,但是可以执行多次（或者说多个）`yield`语句.正常函数只能返回一个值,因为只能执行一次`return`；`Generator`函数可以返回一系列的值,因为可以有任意多个`yield`.从另一个角度看,也可以说`Generator`生成了一系列的值,这也就是它的名称的来历（在英语中,`generator`这个词是“生成器”的意思）.
 
-`Generator`函数可以不用`yield`语句，这时就变成了一个单纯的暂缓执行函数
+`Generator`函数可以不用`yield`语句,这时就变成了一个单纯的暂缓执行函数
 
 ``` JavaScript
 function * fGen(){
@@ -3011,7 +3011,7 @@ for(let [key,value] of person){
 //three:ziyi4
 ```
 #####  Generator.prototype.throw
- `Generator`函数返回的遍历器对象，都有一个`throw`方法，可以在函数体外抛出错误，然后在`Generator`函数体内捕获.
+ `Generator`函数返回的遍历器对象,都有一个`throw`方法,可以在函数体外抛出错误,然后在`Generator`函数体内捕获.
 
 ``` javascript
 var g = function* () {
@@ -3035,9 +3035,9 @@ try {
 // 外部捕获 b
 ```
 
-上面代码中，遍历器对象`i`连续抛出两个错误。第一个错误被`Generator`函数体内的`catch`语句捕获。`i`第二次抛出错误，由于`Generator`函数内部的`catch`语句已经执行过了，不会再捕捉到这个错误了，所以这个错误就被抛出了`Generator`函数体，被函数体外的`catch`语句捕获。
+上面代码中,遍历器对象`i`连续抛出两个错误.第一个错误被`Generator`函数体内的`catch`语句捕获.`i`第二次抛出错误,由于`Generator`函数内部的`catch`语句已经执行过了,不会再捕捉到这个错误了,所以这个错误就被抛出了`Generator`函数体,被函数体外的`catch`语句捕获.
 
-`throw`方法可以接受一个参数，该参数会被`catch`语句接收，建议抛出`Error`对象的实例
+`throw`方法可以接受一个参数,该参数会被`catch`语句接收,建议抛出`Error`对象的实例
 
 ``` javascript
 var g = function* () {
@@ -3054,7 +3054,7 @@ i.next();
 i.throw(new Error('出错了!'));
 ```
 
->提示: 不要混淆遍历器对象的`throw`方法和全局的`throw`命令。上面代码的错误，是用遍历器对象的`throw`方法抛出的，而不是用`throw`命令抛出的。后者只能被函数体外的`catch`语句捕获。
+>提示: 不要混淆遍历器对象的`throw`方法和全局的`throw`命令.上面代码的错误,是用遍历器对象的`throw`方法抛出的,而不是用`throw`命令抛出的.后者只能被函数体外的`catch`语句捕获.
 
 
 如果`Generator`函数内部没有部署`try...catch`代码,那么遍历器对象抛出的异常将会被外部的`catch`代码块捕获
@@ -3177,7 +3177,7 @@ try {
 
 ```
 
-`yield`句本身没有返回值，或者说总是返回`undefined`。`next`方法可以带一个参数，该参数就会被当作上一个`yield`语句的返回值.
+`yield`句本身没有返回值,或者说总是返回`undefined`.`next`方法可以带一个参数,该参数就会被当作上一个`yield`语句的返回值.
 
 ``` javascript
 let gen = function* () {
@@ -3398,7 +3398,7 @@ console.log(g1.next()); // Object { value=3,  done=false}
 console.log(g1.next()); // r:return value  Object { value=4,  done=false}
 console.log(g1.next()); // Object { done=true,  value=undefined}
 ```
->提示: 注意与`yield`中的返回值的区别,`yield`句本身没有返回值，或者说总是返回`undefined`。`next`方法可以带一个参数，该参数就会被当作上一个`yield`语句的返回值。
+>提示: 注意与`yield`中的返回值的区别,`yield`句本身没有返回值,或者说总是返回`undefined`.`next`方法可以带一个参数,该参数就会被当作上一个`yield`语句的返回值.
 
 ``` javascript
 function* iterTree(tree) {
@@ -3452,7 +3452,7 @@ for(let value of obj.g()){
 }
 ```
 
-`Generator`函数总是返回一个遍历器，`ES6`规定这个遍历器是`Generator`函数的实例，也继承了`Generator`函数的`prototype`对象上的方法
+`Generator`函数总是返回一个遍历器,`ES6`规定这个遍历器是`Generator`函数的实例,也继承了`Generator`函数的`prototype`对象上的方法
 
 ``` javascript
 function* g() {}
@@ -3505,23 +3505,23 @@ x.next();   //'Tick!'
 
 ##### 协程
 
-协程（coroutine）是一种程序运行的方式，可以理解成“协作的线程”或“协作的函数”。协程既可以用单线程实现，也可以用多线程实现。前者是一种特殊的子例程，后者是一种特殊的线程。
+协程（coroutine）是一种程序运行的方式,可以理解成“协作的线程”或“协作的函数”.协程既可以用单线程实现,也可以用多线程实现.前者是一种特殊的子例程,后者是一种特殊的线程.
 
 （1）协程与子例程的差异
 
-传统的“子例程”（subroutine）采用堆栈式“后进先出”的执行方式，只有当调用的子函数完全执行完毕，才会结束执行父函数。协程与其不同，多个线程（单线程情况下，即多个函数）可以并行执行，但是只有一个线程（或函数）处于正在运行的状态，其他线程（或函数）都处于暂停态（suspended），线程（或函数）之间可以交换执行权。也就是说，一个线程（或函数）执行到一半，可以暂停执行，将执行权交给另一个线程（或函数），等到稍后收回执行权的时候，再恢复执行。这种可以并行执行、交换执行权的线程（或函数），就称为协程。
+传统的“子例程”（subroutine）采用堆栈式“后进先出”的执行方式,只有当调用的子函数完全执行完毕,才会结束执行父函数.协程与其不同,多个线程（单线程情况下,即多个函数）可以并行执行,但是只有一个线程（或函数）处于正在运行的状态,其他线程（或函数）都处于暂停态（suspended）,线程（或函数）之间可以交换执行权.也就是说,一个线程（或函数）执行到一半,可以暂停执行,将执行权交给另一个线程（或函数）,等到稍后收回执行权的时候,再恢复执行.这种可以并行执行、交换执行权的线程（或函数）,就称为协程.
 
-从实现上看，在内存中，子例程只使用一个栈（stack），而协程是同时存在多个栈，但只有一个栈是在运行状态，也就是说，协程是以多占用内存为代价，实现多任务的并行。
+从实现上看,在内存中,子例程只使用一个栈（stack）,而协程是同时存在多个栈,但只有一个栈是在运行状态,也就是说,协程是以多占用内存为代价,实现多任务的并行.
 
 （2）协程与普通线程的差异
 
-不难看出，协程适合用于多任务运行的环境。在这个意义上，它与普通的线程很相似，都有自己的执行上下文、可以分享全局变量。它们的不同之处在于，同一时间可以有多个线程处于运行状态，但是运行的协程只能有一个，其他协程都处于暂停状态。此外，普通的线程是抢先式的，到底哪个线程优先得到资源，必须由运行环境决定，但是协程是合作式的，执行权由协程自己分配。
+不难看出,协程适合用于多任务运行的环境.在这个意义上,它与普通的线程很相似,都有自己的执行上下文、可以分享全局变量.它们的不同之处在于,同一时间可以有多个线程处于运行状态,但是运行的协程只能有一个,其他协程都处于暂停状态.此外,普通的线程是抢先式的,到底哪个线程优先得到资源,必须由运行环境决定,但是协程是合作式的,执行权由协程自己分配.
 
-由于ECMAScript是单线程语言，只能保持一个调用栈。引入协程以后，每个任务可以保持自己的调用栈。这样做的最大好处，就是抛出错误的时候，可以找到原始的调用栈。不至于像异步操作的回调函数那样，一旦出错，原始的调用栈早就结束。
+由于ECMAScript是单线程语言,只能保持一个调用栈.引入协程以后,每个任务可以保持自己的调用栈.这样做的最大好处,就是抛出错误的时候,可以找到原始的调用栈.不至于像异步操作的回调函数那样,一旦出错,原始的调用栈早就结束.
 
-Generator函数是ECMAScript 6对协程的实现，但属于不完全实现。Generator函数被称为“半协程”（semi-coroutine），意思是只有Generator函数的调用者，才能将程序的执行权还给Generator函数。如果是完全执行的协程，任何函数都可以让暂停的协程继续执行。
+Generator函数是ECMAScript 6对协程的实现,但属于不完全实现.Generator函数被称为“半协程”（semi-coroutine）,意思是只有Generator函数的调用者,才能将程序的执行权还给Generator函数.如果是完全执行的协程,任何函数都可以让暂停的协程继续执行.
 
-如果将Generator函数当作协程，完全可以将多个需要互相协作的任务写成Generator函数，它们之间使用yield语句交换控制权。
+如果将Generator函数当作协程,完全可以将多个需要互相协作的任务写成Generator函数,它们之间使用yield语句交换控制权.
 
 ##### 应用
 - 异步操作的同步化表达
@@ -3605,7 +3605,7 @@ function* longRunningTask() {
 }
 ```
 
-然后，使用一个函数，按次序自动执行所有步骤
+然后,使用一个函数,按次序自动执行所有步骤
 
 ```javascript
 scheduler(longRunningTask());
@@ -3613,7 +3613,7 @@ scheduler(longRunningTask());
 function scheduler(task) {
   setTimeout(function() {
     var taskObj = task.next(task.value);
-    // 如果Generator函数未结束，就继续调用
+    // 如果Generator函数未结束,就继续调用
     if (!taskObj.done) {
       task.value = taskObj.value
       scheduler(task);
@@ -3622,7 +3622,7 @@ function scheduler(task) {
 }
 ```
 
-注意，`yield`语句是同步运行，不是异步运行（否则就失去了取代回调函数的设计目的了）。实际操作中，一般让`yield`语句返回`Promise`对象。
+注意,`yield`语句是同步运行,不是异步运行（否则就失去了取代回调函数的设计目的了）.实际操作中,一般让`yield`语句返回`Promise`对象.
 
 ```javascript
 var Q = require('q');
@@ -3648,7 +3648,7 @@ function *doStuff() {
 }
 
 for (task of doStuff()) {
-  // task是一个函数，可以像回调函数那样使用它
+  // task是一个函数,可以像回调函数那样使用它
 }
 
 ```
@@ -3656,15 +3656,15 @@ for (task of doStuff()) {
 ### Promise
 #### Promise概述
 - 对象的状态不受外界影响
-`Promise`对象代表一个异步操作,有三种状态,`Pending(待决)`,`Resolved(成功)`和 `Rejected(失败)`.只有异步操作的结果，可以决定当前是哪一种状态，任何其他操作都无法改变这个状态,这也是Promise这个名字的由来，它的英语意思就是“承诺”，表示其他手段无法改变。
+`Promise`对象代表一个异步操作,有三种状态,`Pending(待决)`,`Resolved(成功)`和 `Rejected(失败)`.只有异步操作的结果,可以决定当前是哪一种状态,任何其他操作都无法改变这个状态,这也是Promise这个名字的由来,它的英语意思就是“承诺”,表示其他手段无法改变.
 
-- 一旦状态改变，就不会再变，任何时候都可以得到这个结果
+- 一旦状态改变,就不会再变,任何时候都可以得到这个结果
 
-`Promise`对象的状态改变，只有两种可能：从`Pending`变为`Resolved`和从`Pending`变为`Rejected`,只要这两种情况发生，状态就凝固了，不会再变了，会一直保持这个结果
+`Promise`对象的状态改变,只有两种可能：从`Pending`变为`Resolved`和从`Pending`变为`Rejected`,只要这两种情况发生,状态就凝固了,不会再变了,会一直保持这个结果
 
 
-`Promise`也有一些缺点。首先，无法取消`Promise`，一旦新建它就会立即执行，无法中途取消。其次，如果不设置回调函数，`Promise`内部抛出的错误，不会反应到外部。第三，当处于`Pending`状态时，无法得知目前进展到哪一个阶段（刚刚开始还是即将完成）。
-如果某些事件不断地反复发生，一般来说，使用`stream`模式是比部署`Promise`更好的选择
+`Promise`也有一些缺点.首先,无法取消`Promise`,一旦新建它就会立即执行,无法中途取消.其次,如果不设置回调函数,`Promise`内部抛出的错误,不会反应到外部.第三,当处于`Pending`状态时,无法得知目前进展到哪一个阶段（刚刚开始还是即将完成）.
+如果某些事件不断地反复发生,一般来说,使用`stream`模式是比部署`Promise`更好的选择
 
 #### 用法
 
@@ -3689,7 +3689,7 @@ let promise = new Promise((resolve,reject) => {
 
 });
 
-//Promise实例生成以后，可以用then方法分别指定Resolved状态和Reject状态的回调函数。
+//Promise实例生成以后,可以用then方法分别指定Resolved状态和Reject状态的回调函数.
 promise.then(value => {
     //success
 },error => {
@@ -3770,7 +3770,7 @@ getJSON("/posts.json").then(function(json) {
 ```
 
 
-`resolve`函数的参数除了正常的值以外，还可能是另一个`Promise实例`
+`resolve`函数的参数除了正常的值以外,还可能是另一个`Promise实例`
 
 `p2`的`resolve`方法将`p1`作为参数,即一个异步的操作结果返回另一个异步操作,
 **这时`p1`的状态就会传递给`p2`,`p1`的状态决定了`p2`的状态**,如果`p1`状态是`Pending`,那么`p2`的回调函数就会等待`p1`的状态改变,如果`p1`的状态已经是`Resolved`或`Rejected`,那么`p2`的回调函数就会立刻执行
@@ -3848,7 +3848,7 @@ p.then((data) => {
 
 #### Promise.prototype.catch
 
-如果异步操作抛出错误，状态就会变为`Rejected`，就会调用`catch`方法指定的回调函数，处理这个错误
+如果异步操作抛出错误,状态就会变为`Rejected`,就会调用`catch`方法指定的回调函数,处理这个错误
 
 ``` javascript
 let p = new Promise((resolve,reject) => {
@@ -3897,7 +3897,7 @@ promise.then(() => promise)
        .catch(err => console.log(err)); //Error: error data!
 ```
 
-一般来说，不要在`then`方法里面定义`Rejected`状态的回调函数（即`then`的第二个参数），总是使用`catch`方法
+一般来说,不要在`then`方法里面定义`Rejected`状态的回调函数（即`then`的第二个参数）,总是使用`catch`方法
 
 
 ``` javascript
@@ -3916,7 +3916,7 @@ promise.then((data) => console.log(data))
 >提示:使用`catch`不仅能够捕获状态`Rejected`,还能捕获异常错误.因此建议使用`catch`而不是使用`then`方法的第二个参数
 
 
-`Nodejs`有一个`unhandledRejection`事件，专门监听未捕获的`reject`错误。
+`Nodejs`有一个`unhandledRejection`事件,专门监听未捕获的`reject`错误.
 
 ```javascript
 process.on('unhandledRejection', function (err, p) {
@@ -4065,7 +4065,7 @@ let p1 = Promise.resolve($.ajax('url'));
 //将Jquery生成的deferred对象转为一个新的Promise对象
 ```
 
-`$.ajax()`操作完成后，如果使用的是低于1.5.0版本的`jQuery`，返回的是`XHR`对象，你没法进行链式操作；如果高于1.5.0版本，返回的是`deferred`对象，可以进行链式操作,具体详见[jQuery的deferred对象详解](http://www.ruanyifeng.com/blog/2011/08/a_detailed_explanation_of_jquery_deferred_object.html)
+`$.ajax()`操作完成后,如果使用的是低于1.5.0版本的`jQuery`,返回的是`XHR`对象,你没法进行链式操作；如果高于1.5.0版本,返回的是`deferred`对象,可以进行链式操作,具体详见[jQuery的deferred对象详解](http://www.ruanyifeng.com/blog/2011/08/a_detailed_explanation_of_jquery_deferred_object.html)
 
 
 - 参数是Promise实例 
@@ -4080,9 +4080,9 @@ let obj = {
 let p = Promise.resolve(obj);
 p.then((value) => console.log(value));  //resolve value
 ```
->提示: `Promise.resolve`方法会将这个对象转为`Promise`对象，然后就立即执行`obj`对象的`then`方法.该方法执行后,对象`p`的状态就变为`resolved`
+>提示: `Promise.resolve`方法会将这个对象转为`Promise`对象,然后就立即执行`obj`对象的`then`方法.该方法执行后,对象`p`的状态就变为`resolved`
 
-- 参数不是具有then方法的对象，或根本就不是对象
+- 参数不是具有then方法的对象,或根本就不是对象
 
 ```javascript
 let p = Promise.resolve('resolve');
@@ -4136,7 +4136,7 @@ Promise.prototype.done = function (onFulfilled, onRejected) {
 
 #### finally
 
-`finally`方法用于指定不管`Promise`对象最后状态如何，都会执行的操作
+`finally`方法用于指定不管`Promise`对象最后状态如何,都会执行的操作
 
 ```javascript
 server.listen(0)
@@ -4368,7 +4368,7 @@ readFile(fileA)
 
 ```
 
-缺陷:`Promise`的最大问题是代码冗余，原来的任务被`Promise`包装了一下，不管什么操作，一眼看去都是一堆`then`，原来的语义变得很不清楚。
+缺陷:`Promise`的最大问题是代码冗余,原来的任务被`Promise`包装了一下,不管什么操作,一眼看去都是一堆`then`,原来的语义变得很不清楚.
 
 
 #### Generator
@@ -4385,13 +4385,13 @@ let task = asyncTasks();
 task.next().value.then(value => task.next(value)); 
 ```
 
-协程遇到`yield`命令就暂停，等到执行权返回，再从暂停的地方继续往后执行。它的最大优点，就是代码的写法非常像同步操作，如果去除`yield`命令，简直一模一样。
+协程遇到`yield`命令就暂停,等到执行权返回,再从暂停的地方继续往后执行.它的最大优点,就是代码的写法非常像同步操作,如果去除`yield`命令,简直一模一样.
 
 
 ##### Generator函数的数据交换和错误处理
 
-`Generator`函数可以暂停执行和恢复执行，这是它能封装异步任务的根本原因。除此之外，它还有两个特性，使它可以作为异步编程的完整解决方案：函数体内外的数据交换和错误处理机制。
-`next`方法返回值的`value`属性，是`Generator`函数向外输出数据；`next`方法还可以接受参数，这是向`Generator`函数体内输入数据。
+`Generator`函数可以暂停执行和恢复执行,这是它能封装异步任务的根本原因.除此之外,它还有两个特性,使它可以作为异步编程的完整解决方案：函数体内外的数据交换和错误处理机制.
+`next`方法返回值的`value`属性,是`Generator`函数向外输出数据；`next`方法还可以接受参数,这是向`Generator`函数体内输入数据.
 
 ```javascript
 function* gen(x) {
@@ -4475,7 +4475,7 @@ console.log(f(thunk));  //20
 
 ##### JavaScript中的Thunk
 
-`JavaScript`本身是传值调用的.在`JavaScript`语言中，`Thunk`函数替换的不是表达式，而是多参数函数，将其替换成单参数的版本，且只接受回调函数作为参数.
+`JavaScript`本身是传值调用的.在`JavaScript`语言中,`Thunk`函数替换的不是表达式,而是多参数函数,将其替换成单参数的版本,且只接受回调函数作为参数.
 
 ``` javascript
 //多参数,其中最后一个是回调函数
@@ -4649,12 +4649,12 @@ co(gen).then(() => {
 
 ##### 原理
 
-前面说过，`Generator`就是一个异步操作的容器。它的自动执行需要一种机制，当异步操作有了结果，能够自动交回执行权。两种方法可以做到这一点
+前面说过,`Generator`就是一个异步操作的容器.它的自动执行需要一种机制,当异步操作有了结果,能够自动交回执行权.两种方法可以做到这一点
 
 - 回调函数,将异步操作包装成`Thunk`函数,在回调函数中交回执行权
-- `Promise`对象,将异步操作包装成`Promise`对象，用`then`方法交回执行权
+- `Promise`对象,将异步操作包装成`Promise`对象,用`then`方法交回执行权
 
-`co`模块其实就是将两种自动执行器（`Thunk`函数和`Promise`对象），包装成一个模块。使用`co`的前提条件是，`Generator`函数的`yield`命令后面，只能是`Thunk`函数或`Promise`对象
+`co`模块其实就是将两种自动执行器（`Thunk`函数和`Promise`对象）,包装成一个模块.使用`co`的前提条件是,`Generator`函数的`yield`命令后面,只能是`Thunk`函数或`Promise`对象
 
 ##### 基于Promise对象的自动执行
 
@@ -4709,7 +4709,7 @@ run(gen);
 
 ##### 处理并发的异步操作
 
-`co`支持并发的异步操作，即允许某些操作同时进行，等到它们全部完成，才进行下一步
+`co`支持并发的异步操作,即允许某些操作同时进行,等到它们全部完成,才进行下一步
 
 ```javascript
 // 数组的写法
@@ -4731,7 +4731,7 @@ co(function* () {
 }).catch(onerror);
 ```
 
-上面的代码允许并发两个`somethingAsync`异步操作，等到它们全部完成，才会进行下一步
+上面的代码允许并发两个`somethingAsync`异步操作,等到它们全部完成,才会进行下一步
 
 ```javascript
 co(function* () {
@@ -4779,21 +4779,21 @@ var asyncReadFile = async function (){
 ```
 将`*`替换成`async`,`yield`替换成`await`
 
-- 内置执行器。
-`Generator`函数的执行必须靠执行器，所以才有了`co`模块，而`async`函数自带执行器。也就是说，`async`函数的执行，与普通函数一模一样，只要一行。
+- 内置执行器.
+`Generator`函数的执行必须靠执行器,所以才有了`co`模块,而`async`函数自带执行器.也就是说,`async`函数的执行,与普通函数一模一样,只要一行.
 
 ```javascript
 var result = asyncReadFile();
 ```
 
 - 更好的语义
-`async`和`await`，比起`*`和`yield`，语义更清楚了。`async`表示函数里有异步操作，`await`表示紧跟在后面的表达式需要等待结果
+`async`和`await`,比起`*`和`yield`,语义更清楚了.`async`表示函数里有异步操作,`await`表示紧跟在后面的表达式需要等待结果
 
 - 更广的适用性
-`co`模块约定，`yield`命令后面只能是`Thunk`函数或`Promise`对象，而`async`函数的`await`命令后面，可以是`Promise`对象和原始类型的值（数值、字符串和布尔值，但这时等同于同步操作
+`co`模块约定,`yield`命令后面只能是`Thunk`函数或`Promise`对象,而`async`函数的`await`命令后面,可以是`Promise`对象和原始类型的值（数值、字符串和布尔值,但这时等同于同步操作
 
 - 返回值是`Promise`
-`async`函数的返回值是`Promise`对象，这比`Generator`函数的返回值是`Iterator`对象方便多了
+`async`函数的返回值是`Promise`对象,这比`Generator`函数的返回值是`Iterator`对象方便多了
 
 略.
 
@@ -5006,7 +5006,7 @@ let p = new P('ZIYI2',34);
 p._sayName();       //ZIYI2 : 34
 ```
 
-导出的时候如果第三方无法轻易获取,也可以当做私有方法,`bar`和`snaf`都是`Symbol`值，导致第三方无法获取到它们，因此达到了私有方法和私有属性的效果
+导出的时候如果第三方无法轻易获取,也可以当做私有方法,`bar`和`snaf`都是`Symbol`值,导致第三方无法获取到它们,因此达到了私有方法和私有属性的效果
 
 ```javascript
 const bar = Symbol('bar');
@@ -5030,8 +5030,8 @@ export default subclassFactory({
 
 #### 严格模式
 
-类和模块的内部，默认就是严格模式，所以不需要使用`use strict`指定运行模式。只要你的代码写在类或模块之中，就只有严格模式可用。
-考虑到未来所有的代码，其实都是运行在模块之中，所以ES6实际上把整个语言升级到了严格模式
+类和模块的内部,默认就是严格模式,所以不需要使用`use strict`指定运行模式.只要你的代码写在类或模块之中,就只有严格模式可用.
+考虑到未来所有的代码,其实都是运行在模块之中,所以ES6实际上把整个语言升级到了严格模式
 
 
 #### name 
@@ -5121,7 +5121,7 @@ class Father extends Person {
 let f = new Father();   //|this| used uninitialized in Father class constructor
 ```
 
->提示:`ES5`的继承，实质是先创造子类的实例对象this，然后再将父类的方法添加到`this`上面（`Parent.apply(this)`）。`ES6`的继承机制完全不同，实质是先创造父类的实例对象`this`（所以必须先调用`super`方法），然后再用子类的构造函数修改`this`
+>提示:`ES5`的继承,实质是先创造子类的实例对象this,然后再将父类的方法添加到`this`上面（`Parent.apply(this)`）.`ES6`的继承机制完全不同,实质是先创造父类的实例对象`this`（所以必须先调用`super`方法）,然后再用子类的构造函数修改`this`
 
 如果子类不定义`constructor`方法,会被默认添加
 
@@ -5209,9 +5209,9 @@ console.log(f instanceof Person);   //true 与ES5行为一致
 #### prototype和__proto__
 
 - prototype
-子类的__proto__属性，表示构造函数的继承，总是指向父类
+子类的__proto__属性,表示构造函数的继承,总是指向父类
 - __proto__
-子类prototype属性的__proto__属性，表示方法的继承，总是指向父类的prototype属性
+子类prototype属性的__proto__属性,表示方法的继承,总是指向父类的prototype属性
 
 ```javascript
 class Person {}
@@ -5243,8 +5243,8 @@ console.log(bool);  //true
 
 #### super
 
-- 作为函数调用时（即`super(...args)`），`super`代表父类的构造函数
-- 作为对象调用时（即`super.prop`或`super.method()`），`super`代表父类。注意，此时`super`即可以引用父类实例的属性和方法，也可以引用父类的静态方法
+- 作为函数调用时（即`super(...args)`）,`super`代表父类的构造函数
+- 作为对象调用时（即`super.prop`或`super.method()`）,`super`代表父类.注意,此时`super`即可以引用父类实例的属性和方法,也可以引用父类的静态方法
 
 
 #### 原生构造函数的继承
@@ -5302,7 +5302,7 @@ inst.prop
 
 #### Class的Generator方法
 
-`Foo`类的`Symbol.iterator`方法前有一个星号，表示该方法是一个`Generator`函数。`Symbol.iterator`方法返回一个`Foo`类的默认遍历器，`for...of`循环会自动调用这个遍历器。
+`Foo`类的`Symbol.iterator`方法前有一个星号,表示该方法是一个`Generator`函数.`Symbol.iterator`方法返回一个`Foo`类的默认遍历器,`for...of`循环会自动调用这个遍历器.
 
 ```javascript
 class Foo {
@@ -5325,7 +5325,7 @@ for (let x of new Foo('hello', 'world')) {
 
 #### Class的静态属性和实例属性
 
-静态属性指的是`Class`本身的属性，即`Class.propname`，而不是定义在实例对象（`this`）上的属性
+静态属性指的是`Class`本身的属性,即`Class.propname`,而不是定义在实例对象（`this`）上的属性
 
 ```javascript
 class B {}
@@ -5335,7 +5335,7 @@ B.version = 1.0;
 console.log(B.version); //1
 ```
 
-`ES6`明确规定，`Class`内部只有静态方法，没有静态属性
+`ES6`明确规定,`Class`内部只有静态方法,没有静态属性
 
 ```javascript
 class B {
@@ -5344,7 +5344,7 @@ class B {
 console.log(B.version); //bad method definition
 ```
 
-`ES7`有一个静态属性的提案，目前`Babel`转码器支持
+`ES7`有一个静态属性的提案,目前`Babel`转码器支持
 
 ```javascript
 class MyClass {
@@ -5356,7 +5356,7 @@ class MyClass {
 }
 ```
 
-以前，我们定义实例属性，只能写在类的constructor方法里面
+以前,我们定义实例属性,只能写在类的constructor方法里面
 
 ```javascript
 class ReactCounter extends React.Component {
@@ -5369,7 +5369,7 @@ class ReactCounter extends React.Component {
 }
 ```
 
-有了新的写法以后，可以不在`constructor`方法里面定义
+有了新的写法以后,可以不在`constructor`方法里面定义
 
 ```javascript
 class ReactCounter extends React.Component {
@@ -5379,7 +5379,7 @@ class ReactCounter extends React.Component {
 }
 ```
 
-`ES7`中类的静态属性只要在上面的实例属性写法前面，加上`static`关键字就可以了
+`ES7`中类的静态属性只要在上面的实例属性写法前面,加上`static`关键字就可以了
 
 ```javascript
 class MyClass {
@@ -5406,7 +5406,7 @@ class Foo {
 
 #### new.target
 
-`new.target`属性返回`new`命令作用于的那个构造函数(当前类),如果构造函数不是通过new命令调用的，`new.target`会返回`undefined`
+`new.target`属性返回`new`命令作用于的那个构造函数(当前类),如果构造函数不是通过new命令调用的,`new.target`会返回`undefined`
 
 ```javascript
 class Person {
@@ -5485,37 +5485,37 @@ let state = _fs.state,
     readFile = _fs.readFile;
 ```
 
-`ES6`模块不是对象，而是通过`export`命令显式指定输出的代码，输入时也采用静态命令的形式
+`ES6`模块不是对象,而是通过`export`命令显式指定输出的代码,输入时也采用静态命令的形式
 
 ```javascript
 import {state,exists,readFile} from 'fs';
 ```
 
-上面代码的实质是从`fs`模块加载3个方法，其他方法不加载,需要注意的是不是在运行时先获取整个`fs`模块对象,这种加载称为“编译时加载”，即`ES6`可以在编译时就完成模块加载，效率要比`CommonJS`模块的加载方式高,当然，这也导致了没法引用`ES6`模块本身，因为它不是对象.
+上面代码的实质是从`fs`模块加载3个方法,其他方法不加载,需要注意的是不是在运行时先获取整个`fs`模块对象,这种加载称为“编译时加载”,即`ES6`可以在编译时就完成模块加载,效率要比`CommonJS`模块的加载方式高,当然,这也导致了没法引用`ES6`模块本身,因为它不是对象.
 
-- 不再需要UMD模块格式了，将来服务器和浏览器都会支持ES6模块格式
-- 将来浏览器的新API就能用模块格式提供，不再必要做成全局变量或者`navigator`对象的属性
-- 不再需要对象作为命名空间（比如`Math`对象），未来这些功能可以通过模块提供
+- 不再需要UMD模块格式了,将来服务器和浏览器都会支持ES6模块格式
+- 将来浏览器的新API就能用模块格式提供,不再必要做成全局变量或者`navigator`对象的属性
+- 不再需要对象作为命名空间（比如`Math`对象）,未来这些功能可以通过模块提供
 
-浏览器使用ES6模块的语法如下,在网页中插入一个模块`foo.js`，由于`type`属性设为`module`，所以浏览器知道这是一个`ES6`模块
+浏览器使用ES6模块的语法如下,在网页中插入一个模块`foo.js`,由于`type`属性设为`module`,所以浏览器知道这是一个`ES6`模块
 
 ```javascript
 <script type="module" src="foo.js"></script>
 ```
 
-`Node`的默认模块格式是`CommonJS`，目前还没决定怎么支持`ES6`模块。所以，只能通过`Babel`这样的转码器，在`Node`里面使用`ES6`模块
+`Node`的默认模块格式是`CommonJS`,目前还没决定怎么支持`ES6`模块.所以,只能通过`Babel`这样的转码器,在`Node`里面使用`ES6`模块
 
 
 #### 严格模式
-`ES6`的模块自动采用严格模式，不管你有没有在模块头部加上`"use strict"`;
+`ES6`的模块自动采用严格模式,不管你有没有在模块头部加上`"use strict"`;
 
 - 变量必须声明后再使用
-- 函数的参数不能有同名属性，否则报错
+- 函数的参数不能有同名属性,否则报错
 - 不能使用`with`语句
-- 不能对只读属性赋值，否则报错
-- 不能使用前缀0表示八进制数，否则报错
-- 不能删除不可删除的属性，否则报错
-- 不能删除变量`delete prop`，会报错，只能删除属性`delete global[prop]`
+- 不能对只读属性赋值,否则报错
+- 不能使用前缀0表示八进制数,否则报错
+- 不能删除不可删除的属性,否则报错
+- 不能删除变量`delete prop`,会报错,只能删除属性`delete global[prop]`
 - `eval`不会在它的外层作用域引入变量
 - `eval`和`arguments`不能被重新赋值
 - `arguments`不会自动反映函数参数的变化
@@ -5525,10 +5525,10 @@ import {state,exists,readFile} from 'fs';
 - 不能使用`fn.caller`和`fn.arguments`获取函数调用的堆栈 
 - 增加了保留字（比如`protected`、`static`和`interface`）
 
-上面这些限制，模块都必须遵守.
+上面这些限制,模块都必须遵守.
 
 #### export
-`export`命令用于规定模块的对外接口，`import`命令用于输入其他模块提供的功能,对外输出两个变量
+`export`命令用于规定模块的对外接口,`import`命令用于输入其他模块提供的功能,对外输出两个变量
 
 ```javascript
 //profile.js
@@ -5655,7 +5655,7 @@ circle.circumference(3);
 
 #### export default
 
-使用`import`命令的时候，用户需要知道所要加载的变量名或函数名,否则无法加载,用户肯定希望快速上手，未必愿意阅读文档，去了解模块有哪些属性和方法,为了给用户提供方便，让他们不用阅读文档就能加载模块，就要用到`export default`命令，为模块指定默认输出,加载该模块时，`import`命令可以为该匿名函数指定任意名字
+使用`import`命令的时候,用户需要知道所要加载的变量名或函数名,否则无法加载,用户肯定希望快速上手,未必愿意阅读文档,去了解模块有哪些属性和方法,为了给用户提供方便,让他们不用阅读文档就能加载模块,就要用到`export default`命令,为模块指定默认输出,加载该模块时,`import`命令可以为该匿名函数指定任意名字
 
 ```javascript
 //default.js
@@ -5684,7 +5684,7 @@ function foo() {
 export default foo;
 ```
 
-使用`export default`时，对应的`import`语句不需要使用大括号；不使用`export default`时，对应的`import`语句需要使用大括号
+使用`export default`时,对应的`import`语句不需要使用大括号；不使用`export default`时,对应的`import`语句需要使用大括号
 
 
 ```javascript
@@ -5704,7 +5704,7 @@ export function crc32() {
 import {crc32} from 'crc32';
 ```
 
-本质上，`export default`就是输出一个叫做`default`的变量或方法，然后系统允许你为它取任意名字
+本质上,`export default`就是输出一个叫做`default`的变量或方法,然后系统允许你为它取任意名字
 
 ```javascript
 // modules.js
@@ -5722,7 +5722,7 @@ import { default as xxx } from 'modules';
 ```
 
 
-正是因为`export default`命令其实只是输出一个叫做`default`的变量，所以它后面不能跟变量声明语句,`export default a`的含义是将变量`a`的值赋给变量`default`
+正是因为`export default`命令其实只是输出一个叫做`default`的变量,所以它后面不能跟变量声明语句,`export default a`的含义是将变量`a`的值赋给变量`default`
 
 ```javascript
 // 正确
@@ -5742,7 +5742,7 @@ export default var a = 1;
 import $ from 'jquery';
 ```
 
-如果想在一条`import`语句中，同时输入默认方法和其他变量，可以写成下面这样
+如果想在一条`import`语句中,同时输入默认方法和其他变量,可以写成下面这样
 
 ```javascript
 import customName, { otherMethod } from './export-default';
@@ -5761,7 +5761,7 @@ let o = new MyClass();
 
 #### 模块的继承
 
-假设有一个`circleplus`模块，继承了`circle`模块
+假设有一个`circleplus`模块,继承了`circle`模块
 
 ```javascript
 // circleplus.js
@@ -5773,7 +5773,7 @@ export default function(x) {
 }
 ```
 
-上面代码中的`export *`，表示再输出`circle`模块的所有属性和方法,注意，`export *`命令会忽略`circle`模块的`default`方法
+上面代码中的`export *`,表示再输出`circle`模块的所有属性和方法,注意,`export *`命令会忽略`circle`模块的`default`方法
 
 也可以改名后再输出
 
@@ -5787,7 +5787,7 @@ import * as math from 'circleplus';
 
 #### ES6模块加载的实质
 
-`ES6`模块加载的机制，与`CommonJS`模块完全不同。`CommonJS`模块输出的是一个值的拷贝，而`ES6`模块输出的是值的引用,`CommonJS`模块输出的是被输出值的拷贝，也就是说，一旦输出一个值，模块内部的变化就影响不到这个值
+`ES6`模块加载的机制,与`CommonJS`模块完全不同.`CommonJS`模块输出的是一个值的拷贝,而`ES6`模块输出的是值的引用,`CommonJS`模块输出的是被输出值的拷贝,也就是说,一旦输出一个值,模块内部的变化就影响不到这个值
 
 
 ```javascript
@@ -5809,7 +5809,7 @@ mod.incCounter();
 console.log(mod.counter); // 3
 ```
 
-`ES6`模块的运行机制与`CommonJS`不一样，它遇到模块加载命令`import`时，不会去执行模块，而是只生成一个动态的只读引用。等到真的需要用到时，再到模块里面去取值，换句话说，`ES6`的输入有点像`Unix`系统的“符号连接”，原始值变了，`import`输入的值也会跟着变。因此，`ES6`模块是动态引用，并且不会缓存值，模块里面的变量绑定其所在的模块
+`ES6`模块的运行机制与`CommonJS`不一样,它遇到模块加载命令`import`时,不会去执行模块,而是只生成一个动态的只读引用.等到真的需要用到时,再到模块里面去取值,换句话说,`ES6`的输入有点像`Unix`系统的“符号连接”,原始值变了,`import`输入的值也会跟着变.因此,`ES6`模块是动态引用,并且不会缓存值,模块里面的变量绑定其所在的模块
 
 ```javascript
 // lib.js
@@ -5825,7 +5825,7 @@ incCounter();
 console.log(counter); // 4
 ```
 
-由于`ES6`输入的模块变量，只是一个“符号连接”，所以这个变量是只读的，对它进行重新赋值会报错
+由于`ES6`输入的模块变量,只是一个“符号连接”,所以这个变量是只读的,对它进行重新赋值会报错
 
 ```javascript
 // lib.js
@@ -5838,9 +5838,9 @@ obj.prop = 123; // OK
 obj = {}; // TypeError
 ```
 
-main.js从`lib.js`输入变量`obj`，可以对`obj`添加属性，但是重新赋值就会报错。因为变量obj指向的地址是只读的，不能重新赋值，这就好比`main.js`创造了一个名为`obj`的`const`变量.
+main.js从`lib.js`输入变量`obj`,可以对`obj`添加属性,但是重新赋值就会报错.因为变量obj指向的地址是只读的,不能重新赋值,这就好比`main.js`创造了一个名为`obj`的`const`变量.
 
-`export`通过接口，输出的是同一个值。不同的脚本加载这个接口，得到的都是同样的实例
+`export`通过接口,输出的是同一个值.不同的脚本加载这个接口,得到的都是同样的实例
 
 ```javascript
 // mod.js
@@ -5859,7 +5859,7 @@ export let c = new C();
 
 #### 循环加载
 
-“循环加载”（circular dependency）指的是，`a`脚本的执行依赖`b`脚本，而`b`脚本的执行又依赖`a`脚本,通常，“循环加载”表示存在强耦合，如果处理不好，还可能导致递归加载，使得程序无法执行，因此应该避免出现
+“循环加载”（circular dependency）指的是,`a`脚本的执行依赖`b`脚本,而`b`脚本的执行又依赖`a`脚本,通常,“循环加载”表示存在强耦合,如果处理不好,还可能导致递归加载,使得程序无法执行,因此应该避免出现
 
 ##### CommonJS
 
@@ -5872,38 +5872,38 @@ export let c = new C();
 }
 ```
 
-`CommonJS`的一个模块，就是一个脚本文件。`require`命令第一次加载该脚本，就会执行整个脚本，然后在内存生成一个对象,上面代码就是`Node`内部加载模块后生成的一个对象。该对象的`id`属性是模块名，`exports`属性是模块输出的各个接口，`loaded`属性是一个布尔值，表示该模块的脚本是否执行完毕。其他还有很多属性，这里都省略了,以后需要用到这个模块的时候，就会到`exports`属性上面取值。即使再次执行`require`命令，也不会再次执行该模块，而是到缓存之中取值。也就是说，`CommonJS`模块无论加载多少次，都只会在第一次加载时运行一次，以后再加载，就返回第一次运行的结果，除非手动清除系统缓存
+`CommonJS`的一个模块,就是一个脚本文件.`require`命令第一次加载该脚本,就会执行整个脚本,然后在内存生成一个对象,上面代码就是`Node`内部加载模块后生成的一个对象.该对象的`id`属性是模块名,`exports`属性是模块输出的各个接口,`loaded`属性是一个布尔值,表示该模块的脚本是否执行完毕.其他还有很多属性,这里都省略了,以后需要用到这个模块的时候,就会到`exports`属性上面取值.即使再次执行`require`命令,也不会再次执行该模块,而是到缓存之中取值.也就是说,`CommonJS`模块无论加载多少次,都只会在第一次加载时运行一次,以后再加载,就返回第一次运行的结果,除非手动清除系统缓存
 
 
 ```javascript
 //a.js
 exports.done = false;
 var b = require('./b.js');
-console.log('在 a.js 之中，b.done = %j', b.done);
+console.log('在 a.js 之中,b.done = %j', b.done);
 exports.done = true;
 console.log('a.js 执行完毕');
 
 //b.js
 exports.done = false;
 var a = require('./a.js');
-console.log('在 b.js 之中，a.done = %j', a.done);
+console.log('在 b.js 之中,a.done = %j', a.done);
 exports.done = true;
 console.log('b.js 执行完毕');
 
 //main.js
 var a = require('./a.js');
-var b = require('./b.js');    //[main.js执行到第二行时，不会再次执行b.js,而是输出缓存的b.js的执行结果]    
+var b = require('./b.js');    //[main.js执行到第二行时,不会再次执行b.js,而是输出缓存的b.js的执行结果]    
 console.log('在 main.js 之中, a.done=%j, b.done=%j', a.done, b.done);
 
 //console
-在 b.js 之中，a.done = false  [在b.js之中，a.js没有执行完毕，只执行了第一行]
+在 b.js 之中,a.done = false  [在b.js之中,a.js没有执行完毕,只执行了第一行]
 b.js 执行完毕
-在 a.js 之中，b.done = true
+在 a.js 之中,b.done = true
 a.js 执行完毕
 在 main.js 之中, a.done=true, b.done=true
 ```
 
-由于`CommonJS`模块遇到循环加载时，返回的是当前已经执行的部分的值，而不是代码全部执行后的值，两者可能会有差异,所以，输入变量的时候，必须非常小心
+由于`CommonJS`模块遇到循环加载时,返回的是当前已经执行的部分的值,而不是代码全部执行后的值,两者可能会有差异,所以,输入变量的时候,必须非常小心
 
 ```javascript
 var a = require('a'); // 安全的写法
@@ -5941,7 +5941,7 @@ a.js
 bar
 ```
 
-`a.js`的第一行是加载`b.js`，所以先执行的是`b.js`。而`b.js`的第一行又是加载`a.js`，这时由于`a.js`已经开始执行了，所以不会重复执行，而是继续往下执行`b.js`，所以第一行输出的是`b.js`,接着，`b.js`要打印变量`foo`，这时`a.js`还没执行完，取不到`foo`的值，导致打印出来是`undefined`。`b.js`执行完，开始执行`a.js`，这时就一切正常了
+`a.js`的第一行是加载`b.js`,所以先执行的是`b.js`.而`b.js`的第一行又是加载`a.js`,这时由于`a.js`已经开始执行了,所以不会重复执行,而是继续往下执行`b.js`,所以第一行输出的是`b.js`,接着,`b.js`要打印变量`foo`,这时`a.js`还没执行完,取不到`foo`的值,导致打印出来是`undefined`.`b.js`执行完,开始执行`a.js`,这时就一切正常了
 
 `ES6`加载的变量,都是动态引用其所在的模块.只要引用存在,代码就能执行.
 
@@ -5964,7 +5964,7 @@ console.log(A);
 
 ### 编程风格
 
-函数的参数如果是对象的成员，优先使用解构赋值
+函数的参数如果是对象的成员,优先使用解构赋值
 
 ```JavaScript
 // bad
@@ -5983,7 +5983,7 @@ function getFullName({ firstName, lastName }) {
 }
 ```
 
-如果函数返回多个值，优先使用对象的解构赋值，而不是数组的解构赋值。这样便于以后添加返回值，以及更改返回值的顺序
+如果函数返回多个值,优先使用对象的解构赋值,而不是数组的解构赋值.这样便于以后添加返回值,以及更改返回值的顺序
 
 ```javascript
 // bad
@@ -5999,7 +5999,7 @@ function processInput(input) {
 const { left, right } = processInput(input);
 ```
 
-单行定义的对象，最后一个成员不以逗号结尾。多行定义的对象，最后一个成员以逗号结尾
+单行定义的对象,最后一个成员不以逗号结尾.多行定义的对象,最后一个成员以逗号结尾
 
 ```javascript
 // bad
@@ -6018,7 +6018,7 @@ const b = {
 ```
 
 
-对象尽量静态化，一旦定义，就不得随意添加新的属性。如果添加属性不可避免，要使用`Object.assign`方法
+对象尽量静态化,一旦定义,就不得随意添加新的属性.如果添加属性不可避免,要使用`Object.assign`方法
 
 ```JavaScript
 // bad
@@ -6077,7 +6077,7 @@ for (i = 0; i < len; i++) {
 const itemsCopy = [...items];
 ```
 
-使用`Array.from`方法，将类似数组的对象转为数组
+使用`Array.from`方法,将类似数组的对象转为数组
 
 ```javascript
 const foo = document.querySelectorAll('.foo');
@@ -6108,7 +6108,7 @@ const nodes = Array.from(foo);
 ```
 
 
-箭头函数取代`Function.prototype.bind`，不应再用`self/_this/that`绑定 `this`
+箭头函数取代`Function.prototype.bind`,不应再用`self/_this/that`绑定 `this`
 
 ```javascript
 // bad
@@ -6124,9 +6124,9 @@ const boundMethod = method.bind(this);
 const boundMethod = (...params) => method.apply(this, params);
 ```
 
->提示: 简单的、单行的、不会复用的函数，建议采用箭头函数。如果函数体较为复杂，行数较多，还是应该采用传统的函数写法
+>提示: 简单的、单行的、不会复用的函数,建议采用箭头函数.如果函数体较为复杂,行数较多,还是应该采用传统的函数写法
 
-所有配置项都应该集中在一个对象，放在最后一个参数，布尔值不可以直接作为参数
+所有配置项都应该集中在一个对象,放在最后一个参数,布尔值不可以直接作为参数
 
 ```javascript
 // bad
@@ -6138,7 +6138,7 @@ function divide(a, b, { option = false } = {}) {
 }
 ```
 
-不要在函数体内使用`arguments`变量，使用rest运算符（`...`）代替。因为`rest`运算符显式表明你想要获取参数，而且`arguments`是一个类似数组的对象，而`rest`运算符可以提供一个真正的数组
+不要在函数体内使用`arguments`变量,使用rest运算符（`...`）代替.因为`rest`运算符显式表明你想要获取参数,而且`arguments`是一个类似数组的对象,而`rest`运算符可以提供一个真正的数组
 
 ```javascript
 // bad
@@ -6168,7 +6168,7 @@ function handleThings(opts = {}) {
 }
 ```
 
-注意区分`Object`和`Map`，只有模拟现实世界的实体对象时，才使用`Object`。如果只是需要`key: value`的数据结构，使用`Map`结构。因为`Map`有内建的遍历机制
+注意区分`Object`和`Map`,只有模拟现实世界的实体对象时,才使用`Object`.如果只是需要`key: value`的数据结构,使用`Map`结构.因为`Map`有内建的遍历机制
 
 ```javascript
 let map = new Map(arr);
@@ -6268,10 +6268,10 @@ const Breadcrumbs = React.createClass({
 export default Breadcrumbs
 ```
 
-如果模块只有一个输出值，就使用`export default`，如果模块有多个输出值，就不使用`export default`，不要`export default`与普通的`export`同时使用
+如果模块只有一个输出值,就使用`export default`,如果模块有多个输出值,就不使用`export default`,不要`export default`与普通的`export`同时使用
 
 
-如果模块默认输出一个函数，函数名的首字母应该小写
+如果模块默认输出一个函数,函数名的首字母应该小写
 
 ```javascript
 function makeStyleGuide() {
@@ -6288,19 +6288,19 @@ export default StyleGuide;
 ```
 
 
-`ESLint`是一个语法规则和代码风格的检查工具，可以用来保证写出语法正确、风格统一的代码。首先，安装`ESLint`
+`ESLint`是一个语法规则和代码风格的检查工具,可以用来保证写出语法正确、风格统一的代码.首先,安装`ESLint`
 
 ```javascript
 $ npm i -g eslint
 ```
 
-然后，安装`Airbnb`语法规则
+然后,安装`Airbnb`语法规则
 
 ```javascript
 $ npm i -g eslint-config-airbnb
 ```
 
-最后，在项目的根目录下新建一个`.eslintrc`文件，配置`ESLint`
+最后,在项目的根目录下新建一个`.eslintrc`文件,配置`ESLint`
 ```javascript
 {
   "extends": "eslint-config-airbnb"
@@ -6328,7 +6328,7 @@ index.js
 
 ✖ 3 problems (3 errors, 0 warnings)
 ```
-上面代码说明，原文件有三个错误，一个是定义了变量，却没有使用，另外两个是行首缩进为4个空格，而不是规定的2个空格
+上面代码说明,原文件有三个错误,一个是定义了变量,却没有使用,另外两个是行首缩进为4个空格,而不是规定的2个空格
 
 
 ### 参考
